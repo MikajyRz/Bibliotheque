@@ -19,18 +19,13 @@ INSERT INTO TypeAdherent (libelle, duree_pret, quota, nb_reservation_max, duree_
 ('Prof', 21, 5, 3, 14, 14),
 ('Standard', 14, 2, 1, 7, 7);
 
-INSERT INTO EtatExemplaire (libelle) VALUES
-('Neuf'),
-('Bon état'),
-('Usé'),
-('Endommagé');
+-- Insérer les statuts avec les libellés corrects
+INSERT INTO etatexemplaire (id_etat, libelle) VALUES
+(1, 'Disponible'),
+(2, 'Emprunte');
 
 INSERT INTO TypePret (libelle) VALUES
-('À domicile'),
-('Sur place');
-
-INSERT INTO TypePret (libelle) VALUES
-('À domicile'),
+('A domicile'),
 ('Sur place');
 
 
@@ -67,12 +62,12 @@ INSERT INTO Exemplaire (id_livre) VALUES
 (3), -- One copy of Le Seigneur des Anneaux
 (4); -- One copy of Manuel de programmation Java
 
-INSERT INTO StatusExemplaire (id_exemplaire, date_changement, id_etat, id_biblio) VALUES
-(1, '2025-01-01', 1, 1),
-(2, '2025-01-01', 2, 1),
-(3, '2025-01-01', 1, 2),
-(4, '2025-01-01', 1, 2),
-(5, '2025-01-01', 2, 1);
+INSERT INTO StatusExemplaire (id_exemplaire,id_etat_exemplaire ,date_changement, id_biblio) VALUES
+(1,1 ,'2025-01-01', 1),
+(2, 1,'2025-01-01', 1),
+(3, 2,'2025-01-01', 2),
+(4, 2,'2025-01-01', 2),
+(5, 1,'2025-01-01', 1);
 
 
 INSERT INTO Pret (id_exemplaire, id_adherent, id_type_pret, date_pret, date_retour_prevue, date_retour_reelle) VALUES

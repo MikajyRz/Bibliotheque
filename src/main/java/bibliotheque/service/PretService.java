@@ -20,13 +20,15 @@ public class PretService {
     @Autowired
     private PretRepository pretRepository;
     @Autowired
-    private StatutExemplaireRepository statutExemplaireRepository;
+    private StatusExemplaireRepository statutExemplaireRepository;
     @Autowired
     private PenaliteRepository penaliteRepository;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private TypePretRepository typePretRepository;
+    @Autowired
+    private EtatExemplaireRepository etatExemplaireRepository; // Ajout du repository
 
     public String validerPret(int idAdherent, int idExemplaire, int idTypePret, int idBibliothecaire) {
         // 1. Vérifier existence de l'adhérent
@@ -36,7 +38,7 @@ public class PretService {
 
         // 2. Vérifier abonnement valide
         Date today = new Date();
-        boolean abonnementValide = abonnementRepository.findByAdherentId_adherent(idAdherent)
+        boolean abonnementValide = abonnementRepository.findByAdherentId(idAdherent)
                 .stream().anyMatch(ab -> !ab.getDateDebut().after(today) && !ab.getDateFin().before(today));
         if (!abonnementValide) return "L'adhérent n'a pas d'abonnement valide.";
 
@@ -46,14 +48,14 @@ public class PretService {
         Exemplaire exemplaire = optExemplaire.get();
 
         // 4. Vérifier disponibilité de l'exemplaire (dernier statut == Disponible)
-        List<StatutExemplaire> statuts = statutExemplaireRepository.findByExemplaireId_exemplaireOrderByDateChangementDesc(idExemplaire);
-        if (statuts.isEmpty() || !"Disponible".equalsIgnoreCase(statuts.get(0).getLibelle()))
+        List<StatusExemplaire> statuts = statutExemplaireRepository.findByExemplaireIdOrderByDateChangementDesc(idExemplaire);
+        if (statuts.isEmpty() || !"Disponible".equalsIgnoreCase(statuts.get(0).getEtatExemplaire().getLibelle()))
             return "L'exemplaire n'est pas disponible.";
 
         // 5. Vérifier pénalité de l'adhérent
-        boolean penalisé = penaliteRepository.findByPretAdherentId_adherent(idAdherent)
+        boolean penalise = penaliteRepository.findByAdherentId(idAdherent)
                 .stream().anyMatch(p -> p.getDureePenalite() > 0);
-        if (penalisé) return "L'adhérent est pénalisé et ne peut pas emprunter.";
+        if (penalise) return "L'adhérent est pénalisé et ne peut pas emprunter.";
 
         // 6. Vérifier quota restant
         if (adherent.getQuotaRestant() <= 0) return "L'adhérent a atteint son quota de prêts.";
@@ -64,8 +66,8 @@ public class PretService {
             return "L'adhérent est trop jeune pour ce livre.";
 
         // 8. Vérifier exemplaire non réservé par un autre adhérent
-        boolean reservedByOther = reservationRepository.findByExemplaireId_exemplaire(idExemplaire).stream()
-        .anyMatch(r -> r.getAdherent().getId_adherent() != idAdherent);
+        boolean reservedByOther = reservationRepository.findByExemplaireId(idExemplaire).stream()
+                .anyMatch(r -> r.getAdherent().getId_adherent() != idAdherent);
         if (reservedByOther) return "L'exemplaire est réservé par un autre adhérent.";
 
         // 9. Créer le prêt
@@ -77,17 +79,20 @@ public class PretService {
         pret.setExemplaire(exemplaire);
         pret.setTypePret(typePret);
         pret.setDatePret(today);
-        pret.setDateRetourPrevue(calculerDateRetourPrevue(today, typePret.getLibelle())); // à implémenter selon règle métier
+        pret.setDateRetourPrevue(calculerDateRetourPrevue(today, typePret.getLibelle()));
         pretRepository.save(pret);
 
         // 10. Changer le statut de l'exemplaire à Non disponible
-        StatutExemplaire statut = new StatutExemplaire();
+        StatusExemplaire statut = new StatusExemplaire();
         statut.setExemplaire(exemplaire);
         statut.setDateChangement(today);
-        statut.setLibelle("Non disponible");
+        EtatExemplaire etatNonDisponible = etatExemplaireRepository.findByLibelle("Emprunte")
+                .orElseThrow(() -> new RuntimeException("Statut 'Emprunté' non trouvé"));
+        statut.setEtatExemplaire(etatNonDisponible);
         statut.setBibliothecaire(new Bibliothecaire());
         statut.getBibliothecaire().setId_biblio(idBibliothecaire);
         statutExemplaireRepository.save(statut);
+
 
         // 11. Décrémenter le quota de l'adhérent
         adherent.setQuotaRestant(adherent.getQuotaRestant() - 1);
@@ -109,7 +114,6 @@ public class PretService {
     }
 
     private Date calculerDateRetourPrevue(Date datePret, String typePretLibelle) {
-        // Exemple : 14 jours si "Normal", 7 si "Court", etc. (à personnaliser)
         java.util.Calendar cal = java.util.Calendar.getInstance();
         cal.setTime(datePret);
         cal.add(java.util.Calendar.DATE, "Court".equalsIgnoreCase(typePretLibelle) ? 7 : 14);
