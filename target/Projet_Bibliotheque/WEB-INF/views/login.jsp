@@ -259,27 +259,18 @@
             <div class="form-group">
                 <label for="email">Adresse email</label>
                 <div class="input-wrapper email">
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           required 
-                           value="${param.email}"/>
+                    <input type="email" id="email" name="email" required value="${param.email}"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="motDePasse">Mot de passe</label>
                 <div class="input-wrapper password">
-                    <input type="password" 
-                           id="motDePasse" 
-                           name="motDePasse" 
-                           required/>
+                    <input type="password" id="motDePasse" name="motDePasse" required/>
                 </div>
             </div>
 
-            <button type="submit" class="login-button">
-                Se connecter
-            </button>
+            <button type="submit" class="login-button">Se connecter</button>
         </form>
 
         <div class="login-footer">

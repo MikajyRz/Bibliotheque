@@ -3,107 +3,136 @@
 <html>
 <head>
     <title>Accueil Bibliothécaire - Bibliothèque</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: 'Georgia', serif;
-            background: #f5f1ea url('https://www.transparenttextures.com/patterns/wood-pattern.png') repeat;
-            color: #333;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 2px solid #8B4513;
         }
 
         h2 {
             text-align: center;
-            color: #5a3e1b;
-            margin-top: 40px;
+            color: #2c1810;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: 600;
         }
 
-        .container {
-            background-color: #ffffffcc;
-            width: 80%;
-            margin: 40px auto;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        ul {
+            list-style: none;
+            margin-bottom: 2rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #b79e85;
-            text-align: left;
-        }
-
-        th {
-            background-color: #7b5e3b;
-            color: white;
-        }
-
-        td {
-            background-color: #fefdfb;
+        li {
+            margin-bottom: 1rem;
         }
 
         a {
-            color: #5a3e1b;
+            display: inline-block;
+            color: #ffffff;
             text-decoration: none;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            border-radius: 8px;
+            border: 2px solid #2c1810;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            width: 100%;
+            text-align: center;
         }
 
         a:hover {
-            text-decoration: underline;
+            background: linear-gradient(135deg, #654321 0%, #2c1810 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #8B4513;
+        }
+
+        .logout a {
+            background: linear-gradient(135deg, #2c1810 0%, #000000 100%);
+            color: white;
+            border-color: #000000;
+            width: auto;
+            min-width: 150px;
+        }
+
+        .logout a:hover {
+            background: linear-gradient(135deg, #000000 0%, #2c1810 100%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            a {
+                padding: 14px 20px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            a {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>Bienvenue, <c:out value="${userName}"/></h2>
-    <h3>Historique des emprunts</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Adhérent</th>
-                <th>Titre du livre</th>
-                <th>Exemplaire</th>
-                <th>Date de prêt</th>
-                <th>Date de retour prévue</th>
-                <th>Date de retour réelle</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="pret" items="${prets}">
-                <tr>
-                    <td><c:out value="${pret.adherent.nom}"/></td>
-                    <td><c:out value="${pret.exemplaire.livre.titre}"/></td>
-                    <td><c:out value="${pret.exemplaire.id_exemplaire}"/></td>
-                    <td><c:out value="${pret.datePret}"/></td>
-                    <td><c:out value="${pret.dateRetourPrevue}"/></td>
-                    <td><c:out value="${pret.dateRetourReelle != null ? pret.dateRetourReelle : 'Non retourné'}"/></td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-    <div class="form-container">
-        <h3>Filtrer les prêts</h3>
-        <form action="${pageContext.request.contextPath}/bibliothecaires/accueil" method="get">
-            <div>
-                <label for="idAdherent">ID Adhérent (optionnel) :</label>
-                <input type="text" id="idAdherent" name="idAdherent"/>
-            </div>
-            <div>
-                <label for="enCoursSeulement">Prêts en cours uniquement :</label>
-                <input type="checkbox" id="enCoursSeulement" name="enCoursSeulement" value="true"/>
-            </div>
-            <div>
-                <button type="submit">Filtrer</button>
-            </div>
-        </form>
+    <ul>
+        <li><a href="${pageContext.request.contextPath}/prets/nouveau">Prêter un exemplaire</a></li>
+        <li><a href="${pageContext.request.contextPath}/prets/historique">Historique des prêts</a></li>
+    </ul>
+    <div class="logout">
+        <a href="${pageContext.request.contextPath}/">Déconnexion</a>
     </div>
-    <p><a href="${pageContext.request.contextPath}/">Déconnexion</a></p>
-    <a href="${pageContext.request.contextPath}/prets/nouveau">Prêter un exemplaire</a>
 </div>
 </body>
 </html>

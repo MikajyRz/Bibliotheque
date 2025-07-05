@@ -101,7 +101,10 @@ public class PretService {
         // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)        // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)
         boolean isSurPlace = idTypePret == 2;
         if (isSurPlace) {
+            pret.setDateRetourPrevue(today);
             pret.setDateRetourReelle(today); // Retour immédiat pour prêt sur place
+        }else {
+            pret.setDateRetourPrevue(calculerDateRetourPrevue(today, typeAdherent.getDureePret())); // Date retour prévue basée sur duree_pret
         }
         pretRepository.save(pret);
 
