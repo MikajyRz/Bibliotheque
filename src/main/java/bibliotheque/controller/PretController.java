@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 @Controller
 @RequestMapping("/prets")
@@ -34,10 +35,8 @@ public class PretController {
     @Autowired
     private PretRepository pretRepository;
 
-    // Lien depuis bibliothecaire_accueil
-    @GetMapping("/nouveau")
-    public String formPret(Model model, HttpSession session) {
-        // Vérification du rôle
+    @GetMapping("/nouveau/accueil")
+    public String formPretAccueil(Model model, HttpSession session) {
         if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
             return "redirect:/auth/login";
         }
@@ -47,7 +46,9 @@ public class PretController {
         model.addAttribute("adherents", adherents);
         model.addAttribute("exemplaires", exemplaires);
         model.addAttribute("typesPret", typesPret);
-        return "preter_exemplaire";
+        model.addAttribute("showPretForm", true);
+        model.addAttribute("userName", session.getAttribute("userName"));
+        return "bibliothecaire_accueil";
     }
 
     @PostMapping("/nouveau")
@@ -61,21 +62,22 @@ public class PretController {
         if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
             return "redirect:/auth/login";
         }
-        
         Integer idBibliothecaire = (Integer) session.getAttribute("userId");
         if (idBibliothecaire == null) {
             model.addAttribute("errorMessage", "Erreur : Identifiant du bibliothécaire non trouvé.");
             model.addAttribute("adherents", adherentRepository.findAll());
             model.addAttribute("exemplaires", exemplaireRepository.findAll());
             model.addAttribute("typesPret", typePretRepository.findAll());
-            return "preter_exemplaire";
+            model.addAttribute("showPretForm", true);
+            model.addAttribute("userName", session.getAttribute("userName"));
+            return "bibliothecaire_accueil";
         }
 
-        // Convertir datePret en Date, ou utiliser la date du jour si vide
         Date pretDate;
         try {
             if (datePret != null && !datePret.isEmpty()) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
                 pretDate = sdf.parse(datePret);
             } else {
                 pretDate = new Date();
@@ -85,29 +87,67 @@ public class PretController {
             model.addAttribute("adherents", adherentRepository.findAll());
             model.addAttribute("exemplaires", exemplaireRepository.findAll());
             model.addAttribute("typesPret", typePretRepository.findAll());
-            return "preter_exemplaire";
+            model.addAttribute("showPretForm", true);
+            model.addAttribute("userName", session.getAttribute("userName"));
+            return "bibliothecaire_accueil";
         }
 
-        String erreur = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire, pretDate);
+        String resultat = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire, pretDate);
         model.addAttribute("adherents", adherentRepository.findAll());
         model.addAttribute("exemplaires", exemplaireRepository.findAll());
         model.addAttribute("typesPret", typePretRepository.findAll());
+        model.addAttribute("showPretForm", true);
+        model.addAttribute("userName", session.getAttribute("userName"));
 
-        if (erreur != null) {
-            model.addAttribute("errorMessage", erreur);
+        if (resultat == null) {
+            model.addAttribute("successMessage", "Le prêt a bien été enregistré.");
         } else {
-            model.addAttribute("successMessage", "Le prêt a été enregistré avec succès.");
-        } 
-        return "preter_exemplaire";
+            model.addAttribute("errorMessage", resultat);
+        }
+
+        return "bibliothecaire_accueil";
     }
 
-    @GetMapping("/historique")
-    public String historiquePrets(Model model, HttpSession session) {
+    @GetMapping("/historique/accueil")
+    public String historiquePretsAccueil(Model model, HttpSession session) {
         if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
             return "redirect:/auth/login";
         }
         List<Pret> prets = pretRepository.findAll();
+        List<TypePret> typesPret = typePretRepository.findAll();
         model.addAttribute("prets", prets);
-        return "historique_prets";
+        model.addAttribute("typesPret", typesPret);
+        model.addAttribute("userName", session.getAttribute("userName"));
+        return "bibliothecaire_accueil";
+    }
+
+    @GetMapping("/recherche")
+    public String formRecherche(Model model, HttpSession session) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
+        }
+        List<TypePret> typesPret = typePretRepository.findAll();
+        model.addAttribute("typesPret", typesPret);
+        return "bibliothecaire_accueil"; // Retour à la page d'accueil avec le formulaire
+    }
+
+    @PostMapping("/recherche")
+    public String traiterRecherche(
+            @RequestParam(required = false) String adherent,
+            @RequestParam(required = false) String exemplaire,
+            @RequestParam(required = false) Integer idTypePret,
+            @RequestParam(required = false) String dateDebut,
+            @RequestParam(required = false) String dateFin,
+            HttpSession session,
+            Model model) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
+        }
+
+        List<Pret> prets = pretService.rechercherPrets(adherent, exemplaire, idTypePret, dateDebut, dateFin);
+        model.addAttribute("prets", prets);
+        model.addAttribute("typesPret", typePretRepository.findAll());
+
+        return "recherche_prets";
     }
 }

@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Historique des Prêts</title>
+    <title>Résultats de recherche des prêts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
@@ -130,11 +130,11 @@
 </head>
 <body>
 <div class="container">
-    <h2>Historique des Prêts</h2>
+    <h2>Résultats de recherche des prêts</h2>
     <a href="${pageContext.request.contextPath}/bibliothecaires/accueil" class="back-link">Retour à l'accueil</a>
     <c:choose>
         <c:when test="${empty prets}">
-            <p class="no-results">Aucun prêt trouvé.</p>
+            <p class="no-results">Aucun prêt trouvé pour ces critères.</p>
         </c:when>
         <c:otherwise>
             <table>

@@ -5,10 +5,12 @@ import bibliotheque.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 @Service
 public class PretService {
@@ -199,5 +201,49 @@ public class PretService {
         cal.setTime(datePret);
         cal.add(java.util.Calendar.DATE, dureePret);
         return cal.getTime();
+    }
+
+    public List<Pret> rechercherPrets(String adherent, String exemplaire, Integer idTypePret, String dateDebut, String dateFin) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
+        Date startDate = null;
+        Date endDate = null;
+        Integer exemplaireId = null;
+
+        try {
+            if (dateDebut != null && !dateDebut.isEmpty()) {
+                startDate = sdf.parse(dateDebut);
+            }
+            if (dateFin != null && !dateFin.isEmpty()) {
+                endDate = sdf.parse(dateFin);
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("EAT"));
+                cal.setTime(endDate);
+                cal.set(Calendar.HOUR_OF_DAY, 23);
+                cal.set(Calendar.MINUTE, 59);
+                cal.set(Calendar.SECOND, 59);
+                endDate = cal.getTime();
+            }
+            if (exemplaire != null && !exemplaire.isEmpty()) {
+                try {
+                    exemplaireId = Integer.parseInt(exemplaire);
+                } catch (NumberFormatException e) {
+                    // Si ce n'est pas un entier, on le traite comme un titre
+                }
+            }
+        } catch (Exception e) {
+            return List.of();
+        }
+
+        String adherentSearch = (adherent != null && !adherent.isEmpty()) ? "%" + adherent + "%" : null;
+        String exemplaireSearch = (exemplaire != null && !exemplaire.isEmpty() && exemplaireId == null) ? "%" + exemplaire + "%" : null;
+
+        return pretRepository.findByCriteria(
+                adherentSearch,
+                exemplaireSearch,
+                exemplaireId,
+                idTypePret != null && idTypePret != 0 ? idTypePret : null,
+                startDate,
+                endDate);
     }
 }
