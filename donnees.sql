@@ -8,8 +8,6 @@ INSERT INTO TypeLivre (libelle) VALUES
 ('Professionnel'),
 ('Jeunesse');
 
-
-
 INSERT INTO Bibliothecaire (nom, mot_de_passe, email) VALUES
 ('Martin', 'hashed_password_123', 'martin@bibliotheque.com'),
 ('Dupont', 'hashed_password_456', 'dupont@bibliotheque.com');
@@ -59,7 +57,7 @@ INSERT INTO Livre (titre, isbn, id_type, edition, id_auteur, age_minimum, annee_
 INSERT INTO Exemplaire (id_livre) VALUES
 (1), (1), -- Two copies of Les Trois Mousquetaires
 (2), -- One copy of Harry Potter
-(3), -- One copy of Le Seigneur des Anneaux
+(3), (3), -- One copy of Le Seigneur des Anneaux
 (4); -- One copy of Manuel de programmation Java
 
 INSERT INTO StatusExemplaire (id_exemplaire,id_etat_exemplaire ,date_changement, id_biblio) VALUES

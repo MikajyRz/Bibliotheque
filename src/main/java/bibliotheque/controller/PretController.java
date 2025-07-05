@@ -56,11 +56,16 @@ public class PretController {
         }
         Integer idBibliothecaire = (Integer) session.getAttribute("userId");
         String erreur = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire);
+                // Recharger les données pour le formulaire
+        model.addAttribute("adherents", adherentRepository.findAll());
+        model.addAttribute("exemplaires", exemplaireRepository.findAll());
+        model.addAttribute("typesPret", typePretRepository.findAll());
+        
         if (erreur != null) {
-            model.addAttribute("error", erreur);
-            return "erreur_pret";
-        }
-        model.addAttribute("success", "Le prêt a bien été enregistré.");
-        return "success_pret";
+            model.addAttribute("errorMessage", erreur);
+        } else {
+            model.addAttribute("successMessage", "Le prêt a été enregistré avec succès.");
+        } 
+        return "preter_exemplaire";
     }
 }
