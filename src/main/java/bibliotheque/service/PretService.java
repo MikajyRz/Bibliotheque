@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +36,21 @@ public class PretService {
     @Autowired
     private TypeAdherentRepository typeAdherentRepository;
 
+
+        // Liste des jours fériés pour 2025 (exemple pour Madagascar)
+    private static final List<String> JOURS_FERIES_2025 = Arrays.asList(
+            "2025-01-01", // Nouvel An
+            "2025-03-29", // Commémoration des martyrs
+            "2025-04-21", // Lundi de Pâques
+            "2025-05-01", // Fête du Travail
+            "2025-05-29", // Ascension
+            "2025-06-09", // Lundi de Pentecôte
+            "2025-06-26", // Fête de l'Indépendance
+            "2025-08-15", // Assomption
+            "2025-11-01", // Toussaint
+            "2025-12-25"  // Noël
+    );
+
     public String validerPret(int idAdherent, int idExemplaire, int idTypePret, int idBibliothecaire, Date datePret) {
         // 1. Vérifier existence de l'adhérent
         Optional<Adherent> optAdherent = adherentRepository.findById(idAdherent);
@@ -57,10 +73,18 @@ public class PretService {
         if (optExemplaire.isEmpty()) return "L'exemplaire n'existe pas.";
         Exemplaire exemplaire = optExemplaire.get();
 
-        // 4. Vérifier disponibilité de l'exemplaire (dernier statut == Disponible)
+        // 4. Vérifier disponibilité de l'exemplaire
+        // a. Vérifier le dernier statut dans StatusExemplaire
         List<StatusExemplaire> statuts = statutExemplaireRepository.findByExemplaireIdOrderByDateChangementDesc(idExemplaire);
-        if (statuts.isEmpty() || !"Disponible".equalsIgnoreCase(statuts.get(0).getEtatExemplaire().getLibelle()))
-            return "L'exemplaire n'est pas disponible.";
+        if (statuts.isEmpty() || !"Disponible".equalsIgnoreCase(statuts.get(0).getEtatExemplaire().getLibelle())) {
+            return "L'exemplaire n'est pas disponible (statut non disponible).";
+        }
+
+        // b. Vérifier qu'il n'y a pas de prêt actif pour cet exemplaire à la datePret
+        List<Pret> pretsActifs = pretRepository.findActivePretsByExemplaireAndDate(idExemplaire, datePret);
+        if (!pretsActifs.isEmpty()) {
+            return "L'exemplaire n'est pas disponible car il est encore emprunté à la date demandée.";
+        }
 
         // 5. Vérifier pénalité de l'adhérent
         boolean penalise = penaliteRepository.findByAdherentId(idAdherent)
@@ -246,4 +270,60 @@ public class PretService {
                 startDate,
                 endDate);
     }
+
+
+    public String retournerPret(int idAdherent, int idExemplaire, String dateRetour, int idBibliothecaire) {
+
+        // Vérifier si le prêt existe et n'est pas retourné
+        Optional<Pret> optPret = pretRepository.findNonReturnedByAdherentAndExemplaire(idAdherent, idExemplaire);
+        if (optPret.isEmpty()) {
+            return "Aucun prêt actif trouvé pour cet adhérent et cet exemplaire.";
+        }
+        Pret pret = optPret.get();
+
+        // Convertir la date de retour
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
+        Date dateRetourReelle;
+        try {
+            dateRetourReelle = sdf.parse(dateRetour);
+        } catch (Exception e) {
+            return "Format de la date de retour invalide.";
+        }
+
+        // Vérifier si la date de retour est postérieure ou égale à la date de prêt
+        if (dateRetourReelle.before(pret.getDatePret())) {
+            return "La date de retour ne peut pas être antérieure à la date de prêt.";
+        }
+
+        // Vérifier si la date est un jour férié
+        String dateRetourStr = sdf.format(dateRetourReelle);
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("EAT"));
+        cal.setTime(dateRetourReelle);
+        if (JOURS_FERIES_2025.contains(dateRetourStr)) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            while (JOURS_FERIES_2025.contains(sdf.format(cal.getTime()))) {
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            dateRetourReelle = cal.getTime();
+        }
+
+        // Mettre à jour le prêt
+        pret.setDateRetourReelle(dateRetourReelle);
+        pretRepository.save(pret);
+
+        // Mettre à jour le statut de l'exemplaire
+        StatusExemplaire statut = new StatusExemplaire();
+        statut.setExemplaire(pret.getExemplaire());
+        statut.setDateChangement(dateRetourReelle);
+        EtatExemplaire etatDisponible = etatExemplaireRepository.findByLibelle("Disponible")
+                .orElseThrow(() -> new RuntimeException("Statut 'Disponible' non trouvé"));
+        statut.setEtatExemplaire(etatDisponible);
+        statut.setBibliothecaire(new Bibliothecaire());
+        statut.getBibliothecaire().setId_biblio(idBibliothecaire);
+        statutExemplaireRepository.save(statut);
+
+        return null;
+    }
+    
 }

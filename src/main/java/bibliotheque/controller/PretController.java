@@ -145,9 +145,51 @@ public class PretController {
         }
 
         List<Pret> prets = pretService.rechercherPrets(adherent, exemplaire, idTypePret, dateDebut, dateFin);
+        model.addAttribute("searchResults", prets);
         model.addAttribute("prets", prets);
+        model.addAttribute("userName", session.getAttribute("userName"));
         model.addAttribute("typesPret", typePretRepository.findAll());
 
         return "recherche_prets";
+    }
+
+
+    @PostMapping("/retour")
+    public String traiterRetour(
+            @RequestParam int idAdherent,
+            @RequestParam int idExemplaire,
+            @RequestParam String dateRetour,
+            HttpSession session,
+            Model model) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
+        }
+        Integer idBibliothecaire = (Integer) session.getAttribute("userId");
+        if (idBibliothecaire == null) {
+            model.addAttribute("errorMessage", "Erreur : Identifiant du bibliothécaire non trouvé.");
+            model.addAttribute("typesPret", typePretRepository.findAll());
+            model.addAttribute("userName", session.getAttribute("userName"));
+            return "bibliothecaire_accueil";
+        }
+
+        String resultat = pretService.retournerPret(idAdherent, idExemplaire, dateRetour, idBibliothecaire);
+        List<TypePret> typesPret = typePretRepository.findAll();
+        model.addAttribute("typesPret", typesPret);
+        model.addAttribute("userName", session.getAttribute("userName"));
+
+        // Relancer la recherche pour rafraîchir les résultats
+        List<Pret> prets = pretService.rechercherPrets(
+                idAdherent > 0 ? String.valueOf(idAdherent) : null,
+                String.valueOf(idExemplaire),
+                null, null, null);
+        model.addAttribute("searchResults", prets);
+
+        if (resultat == null) {
+            model.addAttribute("successMessage", "Le retour a bien été enregistré.");
+        } else {
+            model.addAttribute("errorMessage", resultat);
+        }
+
+        return "bibliothecaire_accueil";
     }
 }

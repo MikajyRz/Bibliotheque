@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface PretRepository extends JpaRepository<Pret, Integer> {
     List<Pret> findAll();
@@ -28,4 +29,20 @@ public interface PretRepository extends JpaRepository<Pret, Integer> {
             @Param("idTypePret") Integer idTypePret,
             @Param("dateDebut") Date dateDebut,
             @Param("dateFin") Date dateFin);
+
+
+    @Query("SELECT p FROM Pret p " +
+            "WHERE p.adherent.id_adherent = :idAdherent " +
+            "AND p.exemplaire.id_exemplaire = :idExemplaire " +
+            "AND p.dateRetourReelle IS NULL")
+     Optional<Pret> findNonReturnedByAdherentAndExemplaire(
+             @Param("idAdherent") Integer idAdherent,
+             @Param("idExemplaire") Integer idExemplaire);
+
+    @Query("SELECT p FROM Pret p " +
+            "WHERE p.exemplaire.id_exemplaire = :idExemplaire " +
+            "AND (p.dateRetourReelle IS NULL OR p.dateRetourReelle > :datePret)")
+    List<Pret> findActivePretsByExemplaireAndDate(
+            @Param("idExemplaire") Integer idExemplaire,
+            @Param("datePret") Date datePret);
 }

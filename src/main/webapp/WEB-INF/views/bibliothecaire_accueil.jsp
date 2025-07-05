@@ -1,3 +1,4 @@
+```jsp
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -169,6 +170,20 @@
             margin-top: 1rem;
         }
 
+        .return-form {
+            display: inline-block !important;
+            background-color: #f0f0f0;
+            padding: 5px;
+        }
+
+        .return-form input[type="date"] {
+            width: 120px;
+        }
+
+        .return-form button {
+            margin-top: 5px;
+        }
+
         .logout {
             text-align: center;
             margin-top: 2rem;
@@ -231,6 +246,14 @@
                 padding: 8px;
                 font-size: 0.9rem;
             }
+            
+            .return-form input[type="date"] {
+                width: 100px;
+            }
+            
+            .return-form button {
+                margin-top: 5px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -254,6 +277,10 @@
             th, td {
                 padding: 6px;
             }
+            
+            .return-form input[type="date"] {
+                width: 80px;
+            }
         }
     </style>
 </head>
@@ -264,6 +291,7 @@
         <a href="${pageContext.request.contextPath}/prets/nouveau/accueil">Prêter un exemplaire</a>
         <a href="${pageContext.request.contextPath}/prets/historique/accueil">Historique des prêts</a>
         <a href="${pageContext.request.contextPath}/prets/recherche">Recherche des prêts</a>
+        <a href="${pageContext.request.contextPath}/prets/recherche">Retourner un exemplaire</a>
     </nav>
     <c:if test="${showPretForm}">
         <div class="pret-form">
@@ -333,7 +361,7 @@
                         <td><fmt:formatDate value="${pret.dateRetourPrevue}" pattern="dd/MM/yyyy"/></td>
                         <td>
                             <c:choose>
-                                <c:when test="${not empty pret.dateRetourReelle}">
+                                <c:when test="${pret.dateRetourReelle != null}">
                                     <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
                                 </c:when>
                                 <c:otherwise>Non retourné</c:otherwise>
@@ -346,46 +374,11 @@
     </c:if>
     <div class="search-form">
         <h3>Recherche multicritère des prêts</h3>
-        <c:if test="${not empty searchResults}">
-            <h3>Résultats de la recherche</h3>
-            <c:choose>
-                <c:when test="${empty searchResults}">
-                    <p class="no-results">Aucun prêt trouvé pour ces critères.</p>
-                </c:when>
-                <c:otherwise>
-                    <table>
-                        <tr>
-                            <th>ID Prêt</th>
-                            <th>Adhérent</th>
-                            <th>Exemplaire</th>
-                            <th>Type de prêt</th>
-                            <th>Date de prêt</th>
-                            <th>Date de retour prévue</th>
-                            <th>Date de retour réelle</th>
-                        </tr>
-                        <fmt:timeZone value="EAT">
-                            <c:forEach items="${searchResults}" var="pret">
-                                <tr>
-                                    <td>${pret.id_pret}</td>
-                                    <td>${pret.adherent.nom}</td>
-                                    <td>#${pret.exemplaire.id_exemplaire} (${pret.exemplaire.livre.titre})</td>
-                                    <td>${pret.typePret.libelle}</td>
-                                    <td><fmt:formatDate value="${pret.datePret}" pattern="dd/MM/yyyy"/></td>
-                                    <td><fmt:formatDate value="${pret.dateRetourPrevue}" pattern="dd/MM/yyyy"/></td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty pret.dateRetourReelle}">
-                                                <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
-                                            </c:when>
-                                            <c:otherwise>Non retourné</c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </fmt:timeZone>
-                    </table>
-                </c:otherwise>
-            </c:choose>
+        <c:if test="${not empty successMessage}">
+            <div class="success-message">${successMessage}</div>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <div class="error-message">${errorMessage}</div>
         </c:if>
         <form action="${pageContext.request.contextPath}/prets/recherche" method="post">
             <div class="form-group">
@@ -415,6 +408,55 @@
             </div>
             <button type="submit">Rechercher</button>
         </form>
+        <c:if test="${not empty searchResults}">
+            <h3>Résultats de la recherche</h3>
+            <c:choose>
+                <c:when test="${empty searchResults}">
+                    <p class="no-results">Aucun prêt trouvé pour ces critères.</p>
+                </c:when>
+                <c:otherwise>
+                    <table>
+                        <tr>
+                            <th>ID Prêt</th>
+                            <th>Adhérent</th>
+                            <th>Exemplaire</th>
+                            <th>Type de prêt</th>
+                            <th>Date de prêt</th>
+                            <th>Date de retour prévue</th>
+                            <th>Date de retour réelle</th>
+                        </tr>
+                        <fmt:timeZone value="EAT">
+                            <c:forEach items="${searchResults}" var="pret">
+                                <c:out value="Debug: Pret ID=${pret.id_pret}, DateRetourReelle=${pret.dateRetourReelle}"/>
+                                <tr>
+                                    <td>${pret.id_pret}</td>
+                                    <td>${pret.adherent.nom}</td>
+                                    <td>#${pret.exemplaire.id_exemplaire} (${pret.exemplaire.livre.titre})</td>
+                                    <td>${pret.typePret.libelle}</td>
+                                    <td><fmt:formatDate value="${pret.datePret}" pattern="dd/MM/yyyy"/></td>
+                                    <td><fmt:formatDate value="${pret.dateRetourPrevue}" pattern="dd/MM/yyyy"/></td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${pret.dateRetourReelle != null}">
+                                                <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <form action="${pageContext.request.contextPath}/prets/retour" method="post" class="return-form">
+                                                    <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}">
+                                                    <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}">
+                                                    <input type="date" name="dateRetour" required>
+                                                    <button type="submit">Retourner</button>
+                                                </form>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </fmt:timeZone>
+                    </table>
+                </c:otherwise>
+            </c:choose>
+        </c:if>
     </div>
     <div class="logout">
         <a href="${pageContext.request.contextPath}/">Déconnexion</a>
@@ -422,3 +464,4 @@
 </div>
 </body>
 </html>
+```

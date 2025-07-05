@@ -89,6 +89,34 @@
             transform: translateY(-2px);
         }
 
+        .return-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .return-form input[type="date"] {
+            padding: 5px;
+            border: 1px solid #8B4513;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .return-form input[type="submit"] {
+            padding: 5px 10px;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            color: #ffffff;
+            border: 2px solid #2c1810;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .return-form input[type="submit"]:hover {
+            background: linear-gradient(135deg, #654321 0%, #2c1810 100%);
+            transform: translateY(-1px);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
@@ -161,7 +189,14 @@
                                     <c:when test="${not empty pret.dateRetourReelle}">
                                         <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
                                     </c:when>
-                                    <c:otherwise>Non retourné</c:otherwise>
+                                    <c:otherwise>
+                                        <form action="${pageContext.request.contextPath}/prets/retour" method="post">
+                                            <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}"/>
+                                            <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}"/>
+                                            <input type="date" name="dateRetour" required/>
+                                            <input type="submit" value="Retourner"/>
+                                        </form>
+                                    </c:otherwise>
                                 </c:choose>
                             </td>
                         </tr>
