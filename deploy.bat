@@ -2,7 +2,7 @@
 setlocal
 
 :: === Configuration ===
-set "PROJECT_DIR=E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio"
+set "PROJECT_DIR=E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque"
 ::del /f /q "C:\xampp\tomcat\webapps\SpringInit_film.war"
 set WAR_NAME=Projet_Bibliotheque.war
 set TOMCAT_WEBAPPS_DIR=C:\Tomcat\apache-tomcat-10.1.28\webapps

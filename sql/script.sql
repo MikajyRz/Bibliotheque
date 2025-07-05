@@ -87,16 +87,22 @@ CREATE TABLE Livre (
 CREATE TABLE Exemplaire (
     id_exemplaire INT PRIMARY KEY AUTO_INCREMENT,
     id_livre INT NOT NULL,
-    FOREIGN KEY (id_livre) REFERENCES Livre(id_livre),
+    FOREIGN KEY (id_livre) REFERENCES Livre(id_livre)
+);
+
+CREATE TABLE EtatExemplaire (
+    id_etat INT PRIMARY KEY AUTO_INCREMENT,
+    libelle VARCHAR(50) NOT NULL
 );
 
 -- Historique des statuts d'exemplaires
-CREATE TABLE StatutExemplaire (
-    id_statut_exemplaire INT PRIMARY KEY AUTO_INCREMENT,
-    libelle VARCHAR(50) NOT NULL,
+CREATE TABLE StatusExemplaire (
+    id_status_exemplaire INT PRIMARY KEY AUTO_INCREMENT,
     id_exemplaire INT NOT NULL,
+    id_etat_exemplaire INT NOT NULL,
     date_changement DATE NOT NULL,
     id_biblio INT,
+    FOREIGN KEY (id_etat_exemplaire) REFERENCES EtatExemplaire(id_etat),
     FOREIGN KEY (id_exemplaire) REFERENCES Exemplaire(id_exemplaire),
     FOREIGN KEY (id_biblio) REFERENCES Bibliothecaire(id_biblio)
 );

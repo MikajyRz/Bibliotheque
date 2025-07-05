@@ -2,10 +2,12 @@ package bibliotheque.controller;
 
 import bibliotheque.entity.Adherent;
 import bibliotheque.entity.Exemplaire;
+import bibliotheque.entity.Pret;
 import bibliotheque.entity.TypePret;
 import bibliotheque.service.PretService;
 import bibliotheque.repository.AdherentRepository;
 import bibliotheque.repository.ExemplaireRepository;
+import bibliotheque.repository.PretRepository;
 import bibliotheque.repository.TypePretRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class PretController {
     private ExemplaireRepository exemplaireRepository;
     @Autowired
     private TypePretRepository typePretRepository;
+    @Autowired
+    private PretRepository pretRepository;
 
     // Lien depuis bibliothecaire_accueil
     @GetMapping("/nouveau")
@@ -56,11 +60,26 @@ public class PretController {
         }
         Integer idBibliothecaire = (Integer) session.getAttribute("userId");
         String erreur = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire);
+                // Recharger les données pour le formulaire
+        model.addAttribute("adherents", adherentRepository.findAll());
+        model.addAttribute("exemplaires", exemplaireRepository.findAll());
+        model.addAttribute("typesPret", typePretRepository.findAll());
+
         if (erreur != null) {
-            model.addAttribute("error", erreur);
-            return "erreur_pret";
+            model.addAttribute("errorMessage", erreur);
+        } else {
+            model.addAttribute("successMessage", "Le prêt a été enregistré avec succès.");
+        } 
+        return "preter_exemplaire";
+    }
+
+    @GetMapping("/historique")
+    public String historiquePrets(Model model, HttpSession session) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
         }
-        model.addAttribute("success", "Le prêt a bien été enregistré.");
-        return "success_pret";
+        List<Pret> prets = pretRepository.findAll();
+        model.addAttribute("prets", prets);
+        return "historique_prets";
     }
 }
