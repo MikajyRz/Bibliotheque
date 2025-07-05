@@ -33,23 +33,22 @@ public class PretService {
     @Autowired
     private TypeAdherentRepository typeAdherentRepository;
 
-    public String validerPret(int idAdherent, int idExemplaire, int idTypePret, int idBibliothecaire) {
+    public String validerPret(int idAdherent, int idExemplaire, int idTypePret, int idBibliothecaire, Date datePret) {
         // 1. Vérifier existence de l'adhérent
         Optional<Adherent> optAdherent = adherentRepository.findById(idAdherent);
         if (optAdherent.isEmpty()) return "L'adhérent n'existe pas.";
         Adherent adherent = optAdherent.get();
 
         // 2. Vérifier abonnement valide et réinitialiser le quota si nécessaire
-        Date today = new Date();
         List<Abonnement> abonnements = abonnementRepository.findByAdherentId(idAdherent);
         boolean abonnementValide = abonnements.stream()
-                .anyMatch(ab -> !ab.getDateDebut().after(today) && !ab.getDateFin().before(today));
+                .anyMatch(ab -> !ab.getDateDebut().after(datePret) && !ab.getDateFin().before(datePret));
         if (!abonnementValide) {
             return "L'adhérent n'a pas d'abonnement valide.";
         }
 
         // Réinitialiser le quota si nouvelle période (mois)
-        resetQuotaIfNewPeriod(adherent, abonnements, today);
+        resetQuotaIfNewPeriod(adherent, abonnements, datePret);
 
         // 3. Vérifier existence de l'exemplaire
         Optional<Exemplaire> optExemplaire = exemplaireRepository.findById(idExemplaire);
@@ -71,7 +70,7 @@ public class PretService {
 
         // 7. Vérifier âge minimum
         Livre livre = exemplaire.getLivre();
-        if (livre.getAgeMinimum() > getAge(adherent.getDateNaissance(), today))
+        if (livre.getAgeMinimum() > getAge(adherent.getDateNaissance(), datePret))
             return "L'adhérent est trop jeune pour ce livre.";
 
         // 8. Vérifier exemplaire non réservé par un autre adhérent
@@ -94,25 +93,24 @@ public class PretService {
         pret.setAdherent(adherent);
         pret.setExemplaire(exemplaire);
         pret.setTypePret(typePret);
-        pret.setDatePret(today);
-        pret.setDateRetourPrevue(calculerDateRetourPrevue(today, typeAdherent.getDureePret()));
-        pretRepository.save(pret);
+        pret.setDatePret(datePret);
 
         // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)        // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)
         boolean isSurPlace = idTypePret == 2;
         if (isSurPlace) {
-            pret.setDateRetourPrevue(today);
-            pret.setDateRetourReelle(today); // Retour immédiat pour prêt sur place
+            pret.setDateRetourPrevue(datePret);
+            pret.setDateRetourReelle(datePret); // Retour immédiat pour prêt sur place
         }else {
-            pret.setDateRetourPrevue(calculerDateRetourPrevue(today, typeAdherent.getDureePret())); // Date retour prévue basée sur duree_pret
+            pret.setDateRetourPrevue(calculerDateRetourPrevue(datePret, typeAdherent.getDureePret())); // Date retour prévue basée sur duree_pret
         }
+
         pretRepository.save(pret);
 
 
         // 10. Changer le statut de l'exemplaire à Non disponible
         StatusExemplaire statut = new StatusExemplaire();
         statut.setExemplaire(exemplaire);
-        statut.setDateChangement(today);
+        statut.setDateChangement(datePret);
         EtatExemplaire etatNonDisponible = etatExemplaireRepository.findByLibelle("Emprunte")
                 .orElseThrow(() -> new RuntimeException("Statut 'Emprunté' non trouvé"));
         statut.setEtatExemplaire(etatNonDisponible);
@@ -124,7 +122,7 @@ public class PretService {
         if (isSurPlace) {
             StatusExemplaire statutDisponible = new StatusExemplaire();
             statutDisponible.setExemplaire(exemplaire);
-            statutDisponible.setDateChangement(calculerDateLendemain(today));
+            statutDisponible.setDateChangement(calculerDateLendemain(datePret));
             EtatExemplaire etatDisponible = etatExemplaireRepository.findByLibelle("Disponible")
                     .orElseThrow(() -> new RuntimeException("Statut 'Disponible' non trouvé"));
             statutDisponible.setEtatExemplaire(etatDisponible);
