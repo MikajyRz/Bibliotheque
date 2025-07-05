@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -53,14 +55,40 @@ public class PretController {
             @RequestParam int idAdherent,
             @RequestParam int idExemplaire,
             @RequestParam int idTypePret,
+            @RequestParam(required = false) String datePret,
             HttpSession session,
             Model model) {
         if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
             return "redirect:/auth/login";
         }
+        
         Integer idBibliothecaire = (Integer) session.getAttribute("userId");
-        String erreur = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire);
-                // Recharger les données pour le formulaire
+        if (idBibliothecaire == null) {
+            model.addAttribute("errorMessage", "Erreur : Identifiant du bibliothécaire non trouvé.");
+            model.addAttribute("adherents", adherentRepository.findAll());
+            model.addAttribute("exemplaires", exemplaireRepository.findAll());
+            model.addAttribute("typesPret", typePretRepository.findAll());
+            return "preter_exemplaire";
+        }
+
+        // Convertir datePret en Date, ou utiliser la date du jour si vide
+        Date pretDate;
+        try {
+            if (datePret != null && !datePret.isEmpty()) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                pretDate = sdf.parse(datePret);
+            } else {
+                pretDate = new Date();
+            }
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur : Format de la date de prêt invalide.");
+            model.addAttribute("adherents", adherentRepository.findAll());
+            model.addAttribute("exemplaires", exemplaireRepository.findAll());
+            model.addAttribute("typesPret", typePretRepository.findAll());
+            return "preter_exemplaire";
+        }
+
+        String erreur = pretService.validerPret(idAdherent, idExemplaire, idTypePret, idBibliothecaire, pretDate);
         model.addAttribute("adherents", adherentRepository.findAll());
         model.addAttribute("exemplaires", exemplaireRepository.findAll());
         model.addAttribute("typesPret", typePretRepository.findAll());
