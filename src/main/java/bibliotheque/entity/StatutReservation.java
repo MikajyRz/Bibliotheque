@@ -28,4 +28,5 @@ public class StatutReservation {
     public void setLibelle(String libelle) {
         this.libelle = libelle;
     }
+
 }

@@ -1,3 +1,4 @@
+```jsp
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -185,7 +186,6 @@
             transform: translateY(-1px);
         }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -555,13 +555,13 @@
         });
     });
 
-    // Validation pour dateReservation (pas de dates passées)
+    // Validation pour dateReservation
     const dateReservationInput = document.querySelector('input[name="dateReservation"]');
     if (dateReservationInput) {
         dateReservationInput.addEventListener('change', () => {
             const selectedDate = new Date(dateReservationInput.value);
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Ignorer l'heure pour comparer uniquement la date
+            today.setHours(0, 0, 0, 0);
             if (selectedDate < today) {
                 alert('La date de réservation ne peut pas être dans le passé.');
                 dateReservationInput.value = '';

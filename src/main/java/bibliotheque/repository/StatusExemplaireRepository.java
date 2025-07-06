@@ -10,4 +10,6 @@ import java.util.List;
 public interface StatusExemplaireRepository extends JpaRepository<StatusExemplaire, Integer> {
     @Query("SELECT s FROM StatusExemplaire s WHERE s.exemplaire.id_exemplaire = :idExemplaire ORDER BY s.dateChangement DESC")
 List<StatusExemplaire> findByExemplaireIdOrderByDateChangementDesc(@Param("idExemplaire") int id_exemplaire);
+
+// StatusExemplaire findTopByExemplaireIdExemplaireOrderByDateChangementDesc(Integer idExemplaire);
 }

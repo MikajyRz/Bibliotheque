@@ -4,6 +4,7 @@ bibliotheque\repository\ProlongementRepository.class
 bibliotheque\service\TypeAdherentService.class
 bibliotheque\service\PretService.class
 bibliotheque\entity\Retour.class
+bibliotheque\repository\StatutReservationRepository.class
 bibliotheque\entity\JourFerie.class
 bibliotheque\repository\AdherentRepository.class
 bibliotheque\repository\TypeAdherentRepository.class
@@ -14,11 +15,13 @@ bibliotheque\service\AdherentService.class
 bibliotheque\repository\AbonnementRepository.class
 bibliotheque\repository\TypePretRepository.class
 bibliotheque\repository\ReservationRepository.class
+bibliotheque\controller\ReservationController.class
 bibliotheque\repository\EtatExemplaireRepository.class
 bibliotheque\entity\Reservation.class
 bibliotheque\entity\Exemplaire.class
 bibliotheque\entity\TypeLivre.class
 bibliotheque\repository\ExemplaireRepository.class
+bibliotheque\service\ReservationService.class
 bibliotheque\entity\JourOuvrable.class
 bibliotheque\repository\PenaliteRepository.class
 bibliotheque\controller\PretController.class
@@ -33,6 +36,7 @@ bibliotheque\entity\TypePret.class
 bibliotheque\service\BibliothecaireService.class
 bibliotheque\entity\Auteur.class
 bibliotheque\repository\StatusExemplaireRepository.class
+bibliotheque\service\ExemplaireService.class
 bibliotheque\entity\Penalite.class
 bibliotheque\controller\AuthController.class
 bibliotheque\entity\Abonnement.class

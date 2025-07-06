@@ -10,6 +10,7 @@ E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\TypeAdherentService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\AdherentService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Pret.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\ReservationService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\StatutReservation.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Penalite.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\ReservationRepository.java
@@ -24,15 +25,18 @@ E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\AdherentRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\ExemplaireRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\HomeController.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\ReservationController.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Abonnement.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\AuthService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\BibliothecaireController.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\JourFerie.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\ExemplaireService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Prolongement.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\EtatExemplaireRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\AuthController.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\AbonnementRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\PenaliteRepository.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\StatutReservationRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\JourFerieRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Adherent.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\BibliothecaireRepository.java
