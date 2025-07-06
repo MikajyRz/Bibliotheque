@@ -134,20 +134,20 @@
             transform: translateY(-2px);
         }
 
-        .return-form {
+        .return-form, .action-form {
             display: flex;
             gap: 10px;
             align-items: center;
         }
 
-        .return-form input[type="date"] {
+        .return-form input[type="date"], .action-form input[type="date"] {
             padding: 5px;
             border: 1px solid #8B4513;
             border-radius: 4px;
             font-size: 0.9rem;
         }
 
-        .return-form input[type="submit"] {
+        .return-form input[type="submit"], .action-form input[type="submit"] {
             padding: 5px 10px;
             background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
             color: #ffffff;
@@ -165,8 +165,23 @@
             background: linear-gradient(135deg, #2F4F4F 0%, #1C2526 100%);
         }
 
-        .return-form input[type="submit"]:hover {
-            background: linear-gradient(135deg, #654321 0%, #2c1810 100%);
+        .action-form input[type="submit"][value="Accepter"] {
+            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+        }
+
+        .action-form input[type="submit"][value="Accepter"]:hover {
+            background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+        }
+
+        .action-form input[type="submit"][value="Refuser"] {
+            background: linear-gradient(135deg, #FF4500 0%, #B22222 100%);
+        }
+
+        .action-form input[type="submit"][value="Refuser"]:hover {
+            background: linear-gradient(135deg, #B22222 0%, #8B0000 100%);
+        }
+
+        .return-form input[type="submit"]:hover, .action-form input[type="submit"]:hover {
             transform: translateY(-1px);
         }
 
@@ -221,6 +236,8 @@
         <a href="${pageContext.request.contextPath}/prets/nouveau/accueil?section=pret">Prêter un exemplaire</a>
         <a href="${pageContext.request.contextPath}/prets/historique/accueil?section=historique">Historique des prêts</a>
         <a href="${pageContext.request.contextPath}/prets/recherche?section=recherche">Recherche des prêts</a>
+        <a href="${pageContext.request.contextPath}/reservations/nouveau/accueil?section=reservation">Réserver un exemplaire</a>
+        <a href="${pageContext.request.contextPath}/reservations/demandes/accueil?section=demande_reservation">Demandes de réservation</a>
         <a href="${pageContext.request.contextPath}/auth/logout">Déconnexion</a>
     </div>
 
@@ -428,8 +445,99 @@
             </c:choose>
         </c:if>
     </c:if>
+
+    <c:if test="${section == 'reservation'}">
+        <h2>Réserver un exemplaire</h2>
+        <c:if test="${not empty successMessage}">
+            <p class="message success-message">${successMessage}</p>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <p class="message error-message">${errorMessage}</p>
+        </c:if>
+        <form action="${pageContext.request.contextPath}/reservations/nouveau" method="post">
+            <div class="form-group">
+                <label for="idAdherent">Adhérent :</label>
+                <select name="idAdherent" id="idAdherent" required>
+                    <option value="">Sélectionner un adhérent</option>
+                    <c:forEach items="${adherents}" var="adherent">
+                        <option value="${adherent.id_adherent}">${adherent.nom} (${adherent.email})</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="idExemplaire">Exemplaire :</label>
+                <select name="idExemplaire" id="idExemplaire" required>
+                    <option value="">Sélectionner un exemplaire</option>
+                    <c:forEach items="${exemplaires}" var="exemplaire">
+                        <option value="${exemplaire.id_exemplaire}">#${exemplaire.id_exemplaire} (${exemplaire.livre.titre})</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dateReservation">Date de réservation :</label>
+                <input type="date" name="dateReservation" id="dateReservation" required/>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Valider la réservation"/>
+            </div>
+        </form>
+    </c:if>
+
+    <c:if test="${section == 'demande_reservation'}">
+        <h2>Demandes de réservation</h2>
+        <c:if test="${not empty successMessage}">
+            <p class="message success-message">${successMessage}</p>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <p class="message error-message">${errorMessage}</p>
+        </c:if>
+        <c:choose>
+            <c:when test="${empty reservations}">
+                <p class="no-results">Aucune demande de réservation en attente.</p>
+            </c:when>
+            <c:otherwise>
+                <table>
+                    <tr>
+                        <th>ID Réservation</th>
+                        <th>Adhérent</th>
+                        <th>Exemplaire</th>
+                        <th>Date de réservation</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                    <fmt:timeZone value="EAT">
+                        <c:forEach items="${reservations}" var="reservation">
+                            <tr>
+                                <td>${reservation.id_reservation}</td>
+                                <td>${reservation.adherent.nom}</td>
+                                <td>#${reservation.exemplaire.id_exemplaire} (${reservation.exemplaire.livre.titre})</td>
+                                <td><fmt:formatDate value="${reservation.dateReservation}" pattern="dd/MM/yyyy"/></td>
+                                <td>${reservation.statutReservation.libelle}</td>
+                                <td>
+                                    <c:if test="${reservation.statutReservation.libelle == 'en attente'}">
+                                        <form action="${pageContext.request.contextPath}/reservations/accepter" method="post" class="action-form">
+                                            <input type="hidden" name="idReservation" value="${reservation.id_reservation}"/>
+                                            <input type="hidden" name="idAdherent" value="${reservation.adherent.id_adherent}"/>
+                                            <input type="hidden" name="idExemplaire" value="${reservation.exemplaire.id_exemplaire}"/>
+                                            <input type="hidden" name="dateReservation" value="<fmt:formatDate value='${reservation.dateReservation}' pattern='yyyy-MM-dd'/>"/>
+                                            <input type="submit" value="Accepter"/>
+                                        </form>
+                                        <form action="${pageContext.request.contextPath}/reservations/refuser" method="post" class="action-form">
+                                            <input type="hidden" name="idReservation" value="${reservation.id_reservation}"/>
+                                            <input type="submit" value="Refuser"/>
+                                        </form>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </fmt:timeZone>
+                </table>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
 </div>
 <script>
+    // Validation pour dateProlongement
     document.querySelectorAll('.return-form input[name="dateProlongement"]').forEach(input => {
         input.addEventListener('change', () => {
             const dateProlongement = new Date(input.value);
@@ -446,6 +554,20 @@
             }
         });
     });
+
+    // Validation pour dateReservation (pas de dates passées)
+    const dateReservationInput = document.querySelector('input[name="dateReservation"]');
+    if (dateReservationInput) {
+        dateReservationInput.addEventListener('change', () => {
+            const selectedDate = new Date(dateReservationInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Ignorer l'heure pour comparer uniquement la date
+            if (selectedDate < today) {
+                alert('La date de réservation ne peut pas être dans le passé.');
+                dateReservationInput.value = '';
+            }
+        });
+    }
 </script>
 </body>
 </html>
