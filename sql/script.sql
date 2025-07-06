@@ -123,6 +123,7 @@ CREATE TABLE Pret (
 CREATE TABLE Prolongement (
     id_prolongement INT PRIMARY KEY AUTO_INCREMENT,
     id_pret INT NOT NULL,
+    nb_prolongements INT NOT NULL DEFAULT 0,
     FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
 );
 

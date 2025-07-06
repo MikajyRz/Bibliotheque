@@ -35,6 +35,10 @@ public class PretService {
     private EtatExemplaireRepository etatExemplaireRepository;
     @Autowired
     private TypeAdherentRepository typeAdherentRepository;
+    @Autowired
+    private JourFerieRepository jourFerieRepository;
+    @Autowired
+    private ProlongementRepository prolongementRepository;
 
 
         // Liste des jours fériés pour 2025 (exemple pour Madagascar)
@@ -324,6 +328,97 @@ public class PretService {
         statutExemplaireRepository.save(statut);
 
         return null;
+    }
+
+    public String prolongerPret(int idPret, int idBibliothecaire, Date dateProlongement) {
+        // 1. Vérifier l'existence du prêt
+        Optional<Pret> optPret = pretRepository.findById(idPret);
+        if (optPret.isEmpty()) {
+            return "Le prêt n'existe pas.";
+        }
+        Pret pret = optPret.get();
+
+        // 2. Vérifier si le prêt est déjà retourné
+        if (pret.getDateRetourReelle() != null) {
+            return "Le prêt a déjà été retourné.";
+        }
+
+        // 3. Vérifier si le prêt est de type "Sur place" (non prolongeable)
+        if (pret.getTypePret().getId_type_pret() == 2) {
+            return "Les prêts 'Sur place' ne peuvent pas être prolongés.";
+        }
+
+        // 4. Vérifier le type d'adhérent
+        Optional<TypeAdherent> optTypeAdherent = typeAdherentRepository.findById(pret.getAdherent().getTypeAdherent().getId_type_adherent());
+        if (optTypeAdherent.isEmpty()) {
+            return "Type d'adhérent inconnu.";
+        }
+        TypeAdherent typeAdherent = optTypeAdherent.get();
+
+        // 5. Vérifier le nombre de prolongements (limité à 1)
+        if (pret.getNbProlongements() >= 1) {
+            return "Le prêt a déjà été prolongé une fois, aucune prolongation supplémentaire autorisée.";
+        }
+
+        // 6. Vérifier les réservations sur l'exemplaire
+        boolean reservedByOther = reservationRepository.findByExemplaireId(pret.getExemplaire().getId_exemplaire())
+                .stream()
+                .anyMatch(r -> r.getAdherent().getId_adherent() != pret.getAdherent().getId_adherent());
+        if (reservedByOther) {
+            return "L'exemplaire est réservé par un autre adhérent et ne peut pas être prolongé.";
+        }
+
+        // 7. Calculer la date maximale de prolongation
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("EAT"));
+        cal.setTime(pret.getDateRetourPrevue());
+        cal.add(Calendar.DAY_OF_MONTH, typeAdherent.getNbJourMaxProlongement());
+        Date dateMaxProlongement = cal.getTime();
+
+        // 8. Vérifier si la date de prolongation choisie est valide
+        if (dateProlongement.after(dateMaxProlongement)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
+            return "La date de prolongation choisie (" + sdf.format(dateProlongement) + ") dépasse la date maximale autorisée (" + sdf.format(dateMaxProlongement) + ").";
+        }
+
+        // 9. Vérifier si la date de prolongation est postérieure à la date de retour prévue actuelle
+        if (!dateProlongement.after(pret.getDateRetourPrevue())) {
+            return "La date de prolongation doit être postérieure à la date de retour prévue actuelle.";
+        }
+
+        // 10. Vérifier si la date de prolongation tombe un jour férié
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
+        List<JourFerie> joursFeries = jourFerieRepository.findAll();
+        final String[] dateStrHolder = {sdf.format(dateProlongement)};
+        cal.setTime(dateProlongement);
+        Date tempDateRetourPrevue = dateProlongement;
+        while (joursFeries.stream().anyMatch(jf -> sdf.format(jf.getDateJourferie()).equals(dateStrHolder[0])) || JOURS_FERIES_2025.contains(dateStrHolder[0])) {
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            tempDateRetourPrevue = cal.getTime();
+            dateStrHolder[0] = sdf.format(tempDateRetourPrevue);
+        }
+        final Date nouvelleDateRetourPrevue = tempDateRetourPrevue;
+
+        // 11. Vérifier si la nouvelle date est antérieure à la date de fin de l'abonnement
+        List<Abonnement> abonnements = abonnementRepository.findByAdherentId(pret.getAdherent().getId_adherent());
+        boolean abonnementValide = abonnements.stream()
+                .anyMatch(ab -> !ab.getDateDebut().after(nouvelleDateRetourPrevue) && !ab.getDateFin().before(nouvelleDateRetourPrevue));
+        if (!abonnementValide) {
+            return "La nouvelle date de retour dépasse la date de fin de l'abonnement de l'adhérent.";
+        }
+
+        // 12. Mettre à jour le prêt
+        pret.setDateRetourPrevue(nouvelleDateRetourPrevue);
+        pret.setNbProlongements(pret.getNbProlongements() + 1);
+        pretRepository.save(pret);
+
+        // 13. Enregistrer la prolongation dans la table Prolongement
+        Prolongement prolongement = new Prolongement();
+        prolongement.setPret(pret);
+        prolongementRepository.save(prolongement);
+
+        return null; // Succès
     }
     
 }

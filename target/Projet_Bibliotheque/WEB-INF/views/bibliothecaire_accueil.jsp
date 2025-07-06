@@ -140,7 +140,7 @@
         }
 
         .return-form input[type="date"] {
-            padding: 5 Portfoliopx;
+            padding: 5px;
             border: 1px solid #8B4513;
             border-radius: 4px;
             font-size: 0.9rem;
@@ -154,6 +154,14 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
+        }
+
+        .return-form input[type="submit"][value="Prolonger"] {
+            background: linear-gradient(135deg, #4682B4 0%, #2F4F4F 100%);
+        }
+
+        .return-form input[type="submit"][value="Prolonger"]:hover {
+            background: linear-gradient(135deg, #2F4F4F 0%, #1C2526 100%);
         }
 
         .return-form input[type="submit"]:hover {
@@ -351,6 +359,7 @@
                             <th>Date de prêt</th>
                             <th>Date de retour prévue</th>
                             <th>Date de retour réelle</th>
+                            <th>Actions</th>
                         </tr>
                         <fmt:timeZone value="EAT">
                             <c:forEach items="${searchResults}" var="pret">
@@ -366,20 +375,35 @@
                                             <c:when test="${not empty pret.dateRetourReelle}">
                                                 <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
                                             </c:when>
-                                            <c:otherwise>
-                                                <form action="${pageContext.request.contextPath}/prets/retour" method="post" class="return-form">
-                                                    <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}"/>
-                                                    <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}"/>
+                                            <c:otherwise>Non retourné</c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:if test="${empty pret.dateRetourReelle}">
+                                            <form action="${pageContext.request.contextPath}/prets/retour" method="post" class="return-form">
+                                                <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}"/>
+                                                <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}"/>
+                                                <input type="hidden" name="adherent" value="${param.adherent}"/>
+                                                <input type="hidden" name="exemplaire" value="${param.exemplaire}"/>
+                                                <input type="hidden" name="idTypePret" value="${param.idTypePret}"/>
+                                                <input type="hidden" name="dateDebut" value="${param.dateDebut}"/>
+                                                <input type="hidden" name="dateFin" value="${param.dateFin}"/>
+                                                <input type="date" name="dateRetour" required/>
+                                                <input type="submit" value="Retourner"/>
+                                            </form>
+                                            <c:if test="${pret.nbProlongements < pret.adherent.typeAdherent.nbJourMaxProlongement && pret.typePret.id_type_pret != 2}">
+                                                <form action="${pageContext.request.contextPath}/prets/prolonger" method="post" class="return-form">
+                                                    <input type="hidden" name="idPret" value="${pret.id_pret}"/>
                                                     <input type="hidden" name="adherent" value="${param.adherent}"/>
                                                     <input type="hidden" name="exemplaire" value="${param.exemplaire}"/>
                                                     <input type="hidden" name="idTypePret" value="${param.idTypePret}"/>
                                                     <input type="hidden" name="dateDebut" value="${param.dateDebut}"/>
                                                     <input type="hidden" name="dateFin" value="${param.dateFin}"/>
-                                                    <input type="date" name="dateRetour" required/>
-                                                    <input type="submit" value="Retourner"/>
+                                                    <input type="date" name="dateProlongement" required/>
+                                                    <input type="submit" value="Prolonger"/>
                                                 </form>
-                                            </c:otherwise>
-                                        </c:choose>
+                                            </c:if>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>
