@@ -30,6 +30,9 @@ public class Pret {
     @Column(name = "date_retour_reelle")
     private Date dateRetourReelle;
 
+    @Column(name = "nb_prolongements", nullable = false)
+    private int nbProlongements = 0;
+
     public Pret() {}
 
     public int getId_pret() {
@@ -86,5 +89,13 @@ public class Pret {
 
     public void setDateRetourReelle(Date dateRetourReelle) {
         this.dateRetourReelle = dateRetourReelle;
+    }
+
+    public int getNbProlongements() {
+        return nbProlongements;
+    }
+
+    public void setNbProlongements(int nbProlongements) {
+        this.nbProlongements = nbProlongements;
     }
 }

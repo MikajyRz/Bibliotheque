@@ -200,4 +200,60 @@ public class PretController {
 
         return "bibliothecaire_accueil";
     }
+
+    @PostMapping("/prolonger")
+    public String prolongerPret(
+            @RequestParam int idPret,
+            @RequestParam String dateProlongement,
+            @RequestParam(required = false) String adherent,
+            @RequestParam(required = false) String exemplaire,
+            @RequestParam(required = false) Integer idTypePret,
+            @RequestParam(required = false) String dateDebut,
+            @RequestParam(required = false) String dateFin,
+            HttpSession session,
+            Model model) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
+        }
+        Integer idBibliothecaire = (Integer) session.getAttribute("userId");
+        if (idBibliothecaire == null) {
+            model.addAttribute("errorMessage", "Erreur : Identifiant du bibliothécaire non trouvé.");
+            model.addAttribute("typesPret", typePretRepository.findAll());
+            model.addAttribute("section", "recherche");
+            model.addAttribute("userName", session.getAttribute("userName"));
+            return "bibliothecaire_accueil";
+        }
+
+        Date prolongementDate;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
+            prolongementDate = sdf.parse(dateProlongement);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Erreur : Format de la date de prolongation invalide.");
+            model.addAttribute("typesPret", typePretRepository.findAll());
+            model.addAttribute("section", "recherche");
+            model.addAttribute("userName", session.getAttribute("userName"));
+            return "bibliothecaire_accueil";
+        }
+
+        String resultat = pretService.prolongerPret(idPret, idBibliothecaire, prolongementDate);
+        List<TypePret> typesPret = typePretRepository.findAll();
+        model.addAttribute("typesPret", typesPret);
+        model.addAttribute("section", "recherche");
+        model.addAttribute("userName", session.getAttribute("userName"));
+
+        // Relancer la recherche pour rafraîchir les résultats
+        List<Pret> prets = pretService.rechercherPrets(adherent, exemplaire, idTypePret, dateDebut, dateFin);
+        model.addAttribute("searchResults", prets);
+        model.addAttribute("prets", prets);
+
+        if (resultat == null) {
+            model.addAttribute("successMessage", "Le prêt a été prolongé avec succès.");
+        } else {
+            model.addAttribute("errorMessage", resultat);
+        }
+
+        return "bibliothecaire_accueil";
+    }
 }

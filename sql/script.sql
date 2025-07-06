@@ -115,6 +115,7 @@ CREATE TABLE Pret (
     date_pret DATE NOT NULL,
     date_retour_prevue DATE NOT NULL,
     date_retour_reelle DATE,
+    nb_prolongements INT NOT NULL DEFAULT 0,
     FOREIGN KEY (id_exemplaire) REFERENCES Exemplaire(id_exemplaire),
     FOREIGN KEY (id_adherent) REFERENCES Adherent(id_adherent),
     FOREIGN KEY (id_type_pret) REFERENCES TypePret(id_type_pret)

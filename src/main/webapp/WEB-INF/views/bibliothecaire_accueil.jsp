@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -140,7 +141,7 @@
         }
 
         .return-form input[type="date"] {
-            padding: 5 Portfoliopx;
+            padding: 5px;
             border: 1px solid #8B4513;
             border-radius: 4px;
             font-size: 0.9rem;
@@ -154,6 +155,14 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
+        }
+
+        .return-form input[type="submit"][value="Prolonger"] {
+            background: linear-gradient(135deg, #4682B4 0%, #2F4F4F 100%);
+        }
+
+        .return-form input[type="submit"][value="Prolonger"]:hover {
+            background: linear-gradient(135deg, #2F4F4F 0%, #1C2526 100%);
         }
 
         .return-form input[type="submit"]:hover {
@@ -272,6 +281,7 @@
                 <th>Date de prêt</th>
                 <th>Date de retour prévue</th>
                 <th>Date de retour réelle</th>
+                <th>Jours de prolongation</th>
             </tr>
             <fmt:timeZone value="EAT">
                 <c:forEach items="${prets}" var="pret">
@@ -288,6 +298,19 @@
                                     <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy HH:mm:ss"/>
                                 </c:when>
                                 <c:otherwise>Non retourné</c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${pret.nbProlongements > 0}">
+                                    <c:set var="datePret" value="${pret.datePret}"/>
+                                    <c:set var="dureePret" value="${pret.adherent.typeAdherent.dureePret}"/>
+                                    <jsp:useBean id="initialRetourPrevue" class="java.util.Date"/>
+                                    <c:set target="${initialRetourPrevue}" property="time" value="${datePret.time + dureePret * 24 * 60 * 60 * 1000}"/>
+                                    <c:set var="joursProlongation" value="${(pret.dateRetourPrevue.time - initialRetourPrevue.time) / (1000 * 60 * 60 * 24)}"/>
+                                    <fmt:formatNumber value="${joursProlongation}" pattern="0"/>
+                                </c:when>
+                                <c:otherwise>0</c:otherwise>
                             </c:choose>
                         </td>
                     </tr>
@@ -351,6 +374,7 @@
                             <th>Date de prêt</th>
                             <th>Date de retour prévue</th>
                             <th>Date de retour réelle</th>
+                            <th>Actions</th>
                         </tr>
                         <fmt:timeZone value="EAT">
                             <c:forEach items="${searchResults}" var="pret">
@@ -366,20 +390,35 @@
                                             <c:when test="${not empty pret.dateRetourReelle}">
                                                 <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy"/>
                                             </c:when>
-                                            <c:otherwise>
-                                                <form action="${pageContext.request.contextPath}/prets/retour" method="post" class="return-form">
-                                                    <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}"/>
-                                                    <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}"/>
+                                            <c:otherwise>Non retourné</c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <c:if test="${empty pret.dateRetourReelle}">
+                                            <form action="${pageContext.request.contextPath}/prets/retour" method="post" class="return-form">
+                                                <input type="hidden" name="idAdherent" value="${pret.adherent.id_adherent}"/>
+                                                <input type="hidden" name="idExemplaire" value="${pret.exemplaire.id_exemplaire}"/>
+                                                <input type="hidden" name="adherent" value="${param.adherent}"/>
+                                                <input type="hidden" name="exemplaire" value="${param.exemplaire}"/>
+                                                <input type="hidden" name="idTypePret" value="${param.idTypePret}"/>
+                                                <input type="hidden" name="dateDebut" value="${param.dateDebut}"/>
+                                                <input type="hidden" name="dateFin" value="${param.dateFin}"/>
+                                                <input type="date" name="dateRetour" required/>
+                                                <input type="submit" value="Retourner"/>
+                                            </form>
+                                            <c:if test="${pret.nbProlongements < 1 && pret.typePret.id_type_pret != 2}">
+                                                <form action="${pageContext.request.contextPath}/prets/prolonger" method="post" class="return-form">
+                                                    <input type="hidden" name="idPret" value="${pret.id_pret}"/>
                                                     <input type="hidden" name="adherent" value="${param.adherent}"/>
                                                     <input type="hidden" name="exemplaire" value="${param.exemplaire}"/>
                                                     <input type="hidden" name="idTypePret" value="${param.idTypePret}"/>
                                                     <input type="hidden" name="dateDebut" value="${param.dateDebut}"/>
                                                     <input type="hidden" name="dateFin" value="${param.dateFin}"/>
-                                                    <input type="date" name="dateRetour" required/>
-                                                    <input type="submit" value="Retourner"/>
+                                                    <input type="date" name="dateProlongement" data-max-prolongement="${pret.adherent.typeAdherent.nbJourMaxProlongement}" data-date-retour-prevue="<fmt:formatDate value="${pret.dateRetourPrevue}" pattern="yyyy-MM-dd"/>" required/>
+                                                    <input type="submit" value="Prolonger"/>
                                                 </form>
-                                            </c:otherwise>
-                                        </c:choose>
+                                            </c:if>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -390,5 +429,23 @@
         </c:if>
     </c:if>
 </div>
+<script>
+    document.querySelectorAll('.return-form input[name="dateProlongement"]').forEach(input => {
+        input.addEventListener('change', () => {
+            const dateProlongement = new Date(input.value);
+            const dateRetourPrevue = new Date(input.dataset.dateRetourPrevue);
+            const nbJourMaxProlongement = parseInt(input.dataset.maxProlongement);
+            const maxDate = new Date(dateRetourPrevue);
+            maxDate.setDate(maxDate.getDate() + nbJourMaxProlongement);
+            if (dateProlongement > maxDate) {
+                alert(`La date de prolongation ne peut pas dépasser ${maxDate.toLocaleDateString('fr-FR')}.`);
+                input.value = '';
+            } else if (dateProlongement <= dateRetourPrevue) {
+                alert('La date de prolongation doit être postérieure à la date de retour prévue.');
+                input.value = '';
+            }
+        });
+    });
+</script>
 </body>
 </html>

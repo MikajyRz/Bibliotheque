@@ -1,4 +1,6 @@
+bibliotheque\repository\JourFerieRepository.class
 bibliotheque\controller\HomeController.class
+bibliotheque\repository\ProlongementRepository.class
 bibliotheque\service\TypeAdherentService.class
 bibliotheque\service\PretService.class
 bibliotheque\entity\Retour.class
