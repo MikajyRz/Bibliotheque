@@ -26,6 +26,7 @@ INSERT INTO TypePret (libelle) VALUES
 ('A domicile'),
 ('Sur place');
 
+INSERT INTO StatutReservation (libelle) VALUES ('en attente'), ('valide'), ('non valide');
 
 INSERT INTO JourFerie (date_jourferie, nom) VALUES
 ('2025-01-01', 'Nouvel An'),

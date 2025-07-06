@@ -1,5 +1,7 @@
 package bibliotheque.entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,6 +13,16 @@ public class Exemplaire {
     @ManyToOne
     @JoinColumn(name = "id_livre", nullable = false)
     private Livre livre;
+
+        // Autres champs et relations
+        @OneToMany(mappedBy = "exemplaire")
+        private List<StatusExemplaire> statusExemplaires;
+    
+        @OneToMany(mappedBy = "exemplaire")
+        private List<Pret> prets;
+    
+        @OneToMany(mappedBy = "exemplaire")
+        private List<Reservation> reservations;
 
     public Exemplaire() {}
 
