@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 public class PretService {
@@ -91,9 +92,20 @@ public class PretService {
         }
 
         // 5. Vérifier pénalité de l'adhérent
-        boolean penalise = penaliteRepository.findByAdherentId(idAdherent)
-                .stream().anyMatch(p -> p.getDureePenalite() > 0);
-        if (penalise) return "L'adhérent est pénalisé et ne peut pas emprunter.";
+// Vérifier si l'adhérent est pénalisé
+List<Penalite> penalites = penaliteRepository.findAll().stream()
+    .filter(p -> p.getPret().getAdherent().getId_adherent() == idAdherent)
+    .filter(p -> {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(p.getDateApplication());
+        cal.add(Calendar.DATE, p.getDureePenalite());
+        Date dateFinPenalite = cal.getTime();
+        return datePret.before(dateFinPenalite) || datePret.equals(dateFinPenalite);
+    })
+    .collect(Collectors.toList());
+if (!penalites.isEmpty()) {
+    return "L'adhérent est actuellement pénalisé et ne peut pas emprunter.";
+}
 
         // 6. Vérifier quota restant
         if (adherent.getQuotaRestant() <= 0) return "L'adhérent a atteint son quota de prêts.";

@@ -238,6 +238,7 @@
         <a href="${pageContext.request.contextPath}/prets/recherche?section=recherche">Recherche des prêts</a>
         <a href="${pageContext.request.contextPath}/reservations/nouveau/accueil?section=reservation">Réserver un exemplaire</a>
         <a href="${pageContext.request.contextPath}/reservations/demandes/accueil?section=demande_reservation">Demandes de réservation</a>
+        <a href="${pageContext.request.contextPath}/penalites/appliquer">Appliquer une pénalité</a>
         <a href="${pageContext.request.contextPath}/auth/logout">Déconnexion</a>
     </div>
 
@@ -535,6 +536,47 @@
             </c:otherwise>
         </c:choose>
     </c:if>
+
+    <c:if test="${section == 'penalite'}">
+        <h2>Appliquer une pénalité</h2>
+        <c:if test="${not empty successMessage}">
+            <div class="success-message">${successMessage}</div>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <div class="error-message">${errorMessage}</div>
+        </c:if>
+        <form action="${pageContext.request.contextPath}/penalites/appliquer" method="post">
+            <div class="form-group">
+                <label for="idPret">Prêt :</label>
+                <select name="idPret" id="idPret" required>
+                    <option value="">Sélectionner un prêt</option>
+                    <c:forEach items="${prets}" var="pret">
+                        <option value="${pret.id_pret}">Prêt #${pret.id_pret} - Adhérent: ${pret.adherent.nom}, Exemplaire: #${pret.exemplaire.id_exemplaire}</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="idAdherent">Adhérent :</label>
+                <select name="idAdherent" id="idAdherent" required>
+                    <option value="">Sélectionner un adhérent</option>
+                    <c:forEach items="${adherents}" var="adherent">
+                        <option value="${adherent.id_adherent}">${adherent.nom} (${adherent.email})</option>
+                    </c:forEach>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dureePenalite">Durée de la pénalité (jours) :</label>
+                <input type="number" name="dureePenalite" id="dureePenalite" required>
+            </div>
+            <div class="form-group">
+                <label for="dateApplication">Date d'application :</label>
+                <input type="date" name="dateApplication" id="dateApplication" required>
+            </div>
+            <button type="submit">Appliquer la pénalité</button>
+        </form>
+    </c:if>
+
+    
 </div>
 <script>
     // Validation pour dateProlongement

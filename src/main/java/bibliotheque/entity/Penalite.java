@@ -1,5 +1,7 @@
 package bibliotheque.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -14,6 +16,9 @@ public class Penalite {
 
     @Column(name = "duree_penalite", nullable = false)
     private int dureePenalite;
+
+    @Column(name = "date_application", nullable = false)
+    private Date dateApplication;
 
     public Penalite() {}
 
@@ -40,4 +45,13 @@ public class Penalite {
     public void setDureePenalite(int dureePenalite) {
         this.dureePenalite = dureePenalite;
     }
+
+    public Date getDateApplication() {
+        return dateApplication;
+    }
+
+    public void setDateApplication(Date dateApplication) {
+        this.dateApplication = dateApplication;
+    }
+
 }

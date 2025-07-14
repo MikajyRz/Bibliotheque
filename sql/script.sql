@@ -142,6 +142,7 @@ CREATE TABLE Penalite (
     id_penalite INT PRIMARY KEY AUTO_INCREMENT,
     id_pret INT NOT NULL,
     duree_penalite INT NOT NULL,
+    date_application DATE NOT NULL,
     FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
 );
 
