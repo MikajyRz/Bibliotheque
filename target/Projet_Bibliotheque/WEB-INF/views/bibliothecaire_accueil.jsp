@@ -15,8 +15,8 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #654321 50%, #2c1810 100%);
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
@@ -25,64 +25,85 @@
 
         .container {
             background-color: #ffffff;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 2px solid #8B4513;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            border: 3px solid #8B4513;
         }
 
         h2 {
             text-align: center;
             color: #2c1810;
-            margin-bottom: 2rem;
-            font-size: 1.8rem;
-            font-weight: 600;
+            margin-bottom: 2.5rem;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .navbar {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            padding: 1rem;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 12px;
+            border: 1px solid #8B4513;
         }
 
         .navbar a {
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
             color: #ffffff;
             text-decoration: none;
             border-radius: 8px;
             border: 2px solid #2c1810;
-            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .navbar a:hover {
             background: linear-gradient(135deg, #654321 0%, #2c1810 100%);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .content-section {
+            background: #fafafa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         th, td {
-            border: 1px solid #8B4513;
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
+            vertical-align: middle;
         }
 
         th {
             background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
             color: #ffffff;
-            font-weight: 500;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
 
         tr:hover {
@@ -93,99 +114,183 @@
             text-align: center;
             color: #2c1810;
             font-style: italic;
-            margin-top: 1rem;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
         }
 
         .success-message {
-            color: green;
+            color: #28a745;
+            background: #d4edda;
+            border-color: #c3e6cb;
         }
 
         .error-message {
-            color: red;
+            color: #dc3545;
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: #2c1810;
+            font-weight: 600;
         }
 
-        .form-group select, .form-group input {
+        .form-group select, 
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="number"] {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #8B4513;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
             font-size: 1rem;
+            background: white;
         }
 
-        .form-group input[type="submit"] {
-            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
-            color: #ffffff;
-            border: 2px solid #2c1810;
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #8B4513;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .form-group input[type="submit"]:hover {
+        .btn-primary {
+            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
             background: linear-gradient(135deg, #654321 0%, #2c1810 100%);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496 0%, #0f6674 100%);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .return-form, .action-form {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
-        .return-form input[type="date"], .action-form input[type="date"] {
-            padding: 5px;
-            border: 1px solid #8B4513;
+        .return-form input[type="date"], 
+        .action-form input[type="date"] {
+            min-width: 140px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
         }
 
-        .return-form input[type="submit"], .action-form input[type="submit"] {
-            padding: 5px 10px;
-            background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
-            color: #ffffff;
-            border: 2px solid #2c1810;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .retard { 
+            color: #dc3545; 
+            font-weight: 600;
         }
 
-        .return-form input[type="submit"][value="Prolonger"] {
-            background: linear-gradient(135deg, #4682B4 0%, #2F4F4F 100%);
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1rem;
         }
 
-        .return-form input[type="submit"][value="Prolonger"]:hover {
-            background: linear-gradient(135deg, #2F4F4F 0%, #1C2526 100%);
+        .search-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        .action-form input[type="submit"][value="Accepter"] {
-            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
+        .search-title {
+            color: #2c1810;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
         }
 
-        .action-form input[type="submit"][value="Accepter"]:hover {
-            background: linear-gradient(135deg, #228B22 0%, #006400 100%);
+        .welcome-message {
+            text-align: center;
+            color: #2c1810;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 12px;
+            border: 2px solid #8B4513;
         }
 
-        .action-form input[type="submit"][value="Refuser"] {
-            background: linear-gradient(135deg, #FF4500 0%, #B22222 100%);
-        }
-
-        .action-form input[type="submit"][value="Refuser"]:hover {
-            background: linear-gradient(135deg, #B22222 0%, #8B0000 100%);
-        }
-
-        .return-form input[type="submit"]:hover, .action-form input[type="submit"]:hover {
-            transform: translateY(-1px);
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -200,13 +305,36 @@
             }
 
             .navbar {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .return-form, .action-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .return-form input[type="date"], 
+            .action-form input[type="date"] {
+                min-width: auto;
             }
 
             th, td {
                 padding: 8px;
-                font-size: 0.9rem;
+                font-size: 0.875rem;
+            }
+
+            .table-responsive {
+                font-size: 0.8rem;
             }
         }
 
@@ -219,12 +347,42 @@
                 font-size: 1.3rem;
             }
 
-            table {
-                font-size: 0.85rem;
+            .navbar a {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .form-container,
+            .search-form {
+                padding: 1.5rem;
             }
 
             th, td {
                 padding: 6px;
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .btn-sm {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Amélioration des tableaux sur mobile */
+        @media (max-width: 600px) {
+            .table-responsive table {
+                font-size: 0.75rem;
+            }
+
+            .table-responsive th,
+            .table-responsive td {
+                padding: 4px;
+                word-wrap: break-word;
             }
         }
     </style>
@@ -240,6 +398,7 @@
         <a href="${pageContext.request.contextPath}/reservations/demandes/accueil?section=demande_reservation">Demandes de réservation</a>
         <a href="${pageContext.request.contextPath}/penalites/appliquer">Appliquer une pénalité</a>
         <a href="${pageContext.request.contextPath}/penalites/historique">Historique des pénalités</a>
+        <a href="${pageContext.request.contextPath}/prets/prolongements/demandes">Demandes de prolongement</a>
         <a href="${pageContext.request.contextPath}/auth/logout">Déconnexion</a>
     </div>
 
@@ -314,7 +473,12 @@
                         <td>
                             <c:choose>
                                 <c:when test="${not empty pret.dateRetourReelle}">
-                                    <fmt:formatDate value="${pret.dateRetourReelle}" pattern="dd/MM/yyyy HH:mm:ss"/>
+                                    <c:if test="${pret.dateRetourReelle > pret.dateRetourPrevue}">
+                                        <span class="retard"><fmt:formatDate value="${pret.dateRetourReelle}" pattern="yyyy-MM-dd" /></span>
+                                    </c:if>
+                                    <c:if test="${pret.dateRetourReelle <= pret.dateRetourPrevue}">
+                                        <fmt:formatDate value="${pret.dateRetourReelle}" pattern="yyyy-MM-dd" />
+                                    </c:if>
                                 </c:when>
                                 <c:otherwise>Non retourné</c:otherwise>
                             </c:choose>
@@ -426,7 +590,7 @@
                                                 <input type="submit" value="Retourner"/>
                                             </form>
                                             <c:if test="${pret.nbProlongements < 1 && pret.typePret.id_type_pret != 2}">
-                                                <form action="${pageContext.request.contextPath}/prets/prolonger" method="post" class="return-form">
+                                                <form action="${pageContext.request.contextPath}/prets/demander-prolongement" method="post" class="return-form">
                                                     <input type="hidden" name="idPret" value="${pret.id_pret}"/>
                                                     <input type="hidden" name="adherent" value="${param.adherent}"/>
                                                     <input type="hidden" name="exemplaire" value="${param.exemplaire}"/>
@@ -434,7 +598,7 @@
                                                     <input type="hidden" name="dateDebut" value="${param.dateDebut}"/>
                                                     <input type="hidden" name="dateFin" value="${param.dateFin}"/>
                                                     <input type="date" name="dateProlongement" data-max-prolongement="${pret.adherent.typeAdherent.nbJourMaxProlongement}" data-date-retour-prevue="<fmt:formatDate value="${pret.dateRetourPrevue}" pattern="yyyy-MM-dd"/>" required/>
-                                                    <input type="submit" value="Prolonger"/>
+                                                    <input type="submit" value="Demander prolonger"/>
                                                 </form>
                                             </c:if>
                                         </c:if>
@@ -616,6 +780,61 @@
                                 <c:set target="${dateFinPenalite}" property="time" 
                                        value="${penalite.dateApplication.time + (penalite.dureePenalite * 24 * 60 * 60 * 1000)}" />
                                 <fmt:formatDate value="${dateFinPenalite}" pattern="yyyy-MM-dd" />
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </c:otherwise>
+        </c:choose>
+    </c:if>
+
+    <c:if test="${section == 'demandes_prolongements'}">
+        <h2>Demandes de prolongement</h2>
+        <c:if test="${not empty successMessage}">
+            <p style="color: green;">${successMessage}</p>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <p style="color: red;">${errorMessage}</p>
+        </c:if>
+        <c:choose>
+            <c:when test="${empty prolongements}">
+                <p>Aucune demande de prolongement en attente.</p>
+            </c:when>
+            <c:otherwise>
+                <table border="1">
+                    <tr>
+                        <th>ID Demande</th>
+                        <th>Prêt</th>
+                        <th>Adhérent</th>
+                        <th>Exemplaire</th>
+                        <th>Date de prêt</th>
+                        <th>Date de retour prévue actuelle</th>
+                        <th>Date de prolongation proposée</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                    <c:forEach items="${prolongements}" var="prolongement">
+                        <tr>
+                            <td>${prolongement.id_prolongement}</td>
+                            <td>Prêt #${prolongement.pret.id_pret}</td>
+                            <td>${prolongement.pret.adherent.nom}</td>
+                            <td>#${prolongement.pret.exemplaire.id_exemplaire} (${prolongement.pret.exemplaire.livre.titre})</td>
+                            <td><fmt:formatDate value="${prolongement.pret.datePret}" pattern="yyyy-MM-dd" /></td>
+                            <td><fmt:formatDate value="${prolongement.pret.dateRetourPrevue}" pattern="yyyy-MM-dd" /></td>
+                            <td><fmt:formatDate value="${prolongement.dateProlongementProposee}" pattern="yyyy-MM-dd" /></td>
+                            <td>${prolongement.statut}</td>
+                            <td>
+                                <c:if test="${prolongement.statut == 'en attente'}">
+                                    <form action="${pageContext.request.contextPath}/prets/prolongements/accepter" method="post" style="display:inline;">
+                                        <input type="hidden" name="idProlongement" value="${prolongement.id_prolongement}" />
+                                        <input type="hidden" name="idBibliothecaire" value="${sessionScope.userId}" />
+                                        <input type="submit" value="Accepter" />
+                                    </form>
+                                    <form action="${pageContext.request.contextPath}/prets/prolongements/refuser" method="post" style="display:inline;">
+                                        <input type="hidden" name="idProlongement" value="${prolongement.id_prolongement}" />
+                                        <input type="submit" value="Refuser" />
+                                    </form>
+                                </c:if>
                             </td>
                         </tr>
                     </c:forEach>

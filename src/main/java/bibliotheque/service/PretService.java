@@ -41,8 +41,7 @@ public class PretService {
     @Autowired
     private ProlongementRepository prolongementRepository;
 
-
-        // Liste des jours fériés pour 2025 (exemple pour Madagascar)
+    // Liste des jours fériés pour 2025 (exemple pour Madagascar)
     private static final List<String> JOURS_FERIES_2025 = Arrays.asList(
             "2025-01-01", // Nouvel An
             "2025-03-29", // Commémoration des martyrs
@@ -61,7 +60,7 @@ public class PretService {
         Optional<Adherent> optAdherent = adherentRepository.findById(idAdherent);
         if (optAdherent.isEmpty()) return "L'adhérent n'existe pas.";
         Adherent adherent = optAdherent.get();
-
+    
         // 2. Vérifier abonnement valide et réinitialiser le quota si nécessaire
         List<Abonnement> abonnements = abonnementRepository.findByAdherentId(idAdherent);
         boolean abonnementValide = abonnements.stream()
@@ -69,61 +68,63 @@ public class PretService {
         if (!abonnementValide) {
             return "L'adhérent n'a pas d'abonnement valide.";
         }
-
+    
         // Réinitialiser le quota si nouvelle période (mois)
         resetQuotaIfNewPeriod(adherent, abonnements, datePret);
-
+    
         // 3. Vérifier existence de l'exemplaire
         Optional<Exemplaire> optExemplaire = exemplaireRepository.findById(idExemplaire);
         if (optExemplaire.isEmpty()) return "L'exemplaire n'existe pas.";
         Exemplaire exemplaire = optExemplaire.get();
-
+    
         // 4. Vérifier disponibilité de l'exemplaire
         // a. Vérifier le dernier statut dans StatusExemplaire
         List<StatusExemplaire> statuts = statutExemplaireRepository.findByExemplaireIdOrderByDateChangementDesc(idExemplaire);
         if (statuts.isEmpty() || !"Disponible".equalsIgnoreCase(statuts.get(0).getEtatExemplaire().getLibelle())) {
             return "L'exemplaire n'est pas disponible (statut non disponible).";
         }
-
+    
         // b. Vérifier qu'il n'y a pas de prêt actif pour cet exemplaire à la datePret
         List<Pret> pretsActifs = pretRepository.findActivePretsByExemplaireAndDate(idExemplaire, datePret);
         if (!pretsActifs.isEmpty()) {
             return "L'exemplaire n'est pas disponible car il est encore emprunté à la date demandée.";
         }
-
+    
         // 5. Vérifier pénalité de l'adhérent
-// Vérifier si l'adhérent est pénalisé
-List<Penalite> penalites = penaliteRepository.findAll().stream()
-    .filter(p -> p.getPret().getAdherent().getId_adherent() == idAdherent)
-    .filter(p -> {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(p.getDateApplication());
-        cal.add(Calendar.DATE, p.getDureePenalite());
-        Date dateFinPenalite = cal.getTime();
-        return datePret.before(dateFinPenalite) || datePret.equals(dateFinPenalite);
-    })
-    .collect(Collectors.toList());
-if (!penalites.isEmpty()) {
-    return "L'adhérent est actuellement pénalisé et ne peut pas emprunter.";
-}
-
+        List<Penalite> penalites = penaliteRepository.findAll().stream()
+            .filter(p -> p.getPret().getAdherent().getId_adherent() == idAdherent)
+            .filter(p -> {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(p.getDateApplication());
+                cal.add(Calendar.DATE, p.getDureePenalite());
+                Date dateFinPenalite = cal.getTime();
+                return datePret.before(dateFinPenalite) || datePret.equals(dateFinPenalite);
+            })
+            .collect(Collectors.toList());
+        if (!penalites.isEmpty()) {
+            return "L'adhérent est actuellement pénalisé et ne peut pas emprunter.";
+        }
+    
         // 6. Vérifier quota restant
         if (adherent.getQuotaRestant() <= 0) return "L'adhérent a atteint son quota de prêts.";
-
+    
         // 7. Vérifier âge minimum
         Livre livre = exemplaire.getLivre();
         if (livre.getAgeMinimum() > getAge(adherent.getDateNaissance(), datePret))
             return "L'adhérent est trop jeune pour ce livre.";
-
+    
         // 8. Vérifier exemplaire non réservé par un autre adhérent
-        boolean reservedByOther = reservationRepository.findByExemplaireId(idExemplaire).stream()
-                .anyMatch(r -> r.getAdherent().getId_adherent() != idAdherent);
+        boolean reservedByOther = reservationRepository.findByExemplaireId(idExemplaire)
+            .stream()
+            .anyMatch(r -> r.getAdherent().getId_adherent() != idAdherent 
+                && ("en attente".equalsIgnoreCase(r.getStatutReservation().getLibelle()) 
+                    || "valide".equalsIgnoreCase(r.getStatutReservation().getLibelle())));
         if (reservedByOther) return "L'exemplaire est réservé par un autre adhérent.";
-
+    
         // 9. Créer le prêt
         TypePret typePret = typePretRepository.findById(idTypePret).orElse(null);
         if (typePret == null) return "Type de prêt inconnu.";
-
+    
         // Récupérer la durée de prêt depuis TypeAdherent
         Optional<TypeAdherent> optTypeAdherent = typeAdherentRepository.findById(adherent.getTypeAdherent().getId_type_adherent());
         if (optTypeAdherent.isEmpty()) {
@@ -136,19 +137,18 @@ if (!penalites.isEmpty()) {
         pret.setExemplaire(exemplaire);
         pret.setTypePret(typePret);
         pret.setDatePret(datePret);
-
-        // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)        // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)
+    
+        // Gestion spéciale pour prêt "Sur place" (id_type_pret = 2)
         boolean isSurPlace = idTypePret == 2;
         if (isSurPlace) {
             pret.setDateRetourPrevue(datePret);
             pret.setDateRetourReelle(datePret); // Retour immédiat pour prêt sur place
-        }else {
+        } else {
             pret.setDateRetourPrevue(calculerDateRetourPrevue(datePret, typeAdherent.getDureePret())); // Date retour prévue basée sur duree_pret
         }
-
+    
         pretRepository.save(pret);
-
-
+    
         // 10. Changer le statut de l'exemplaire à Non disponible
         StatusExemplaire statut = new StatusExemplaire();
         statut.setExemplaire(exemplaire);
@@ -159,7 +159,7 @@ if (!penalites.isEmpty()) {
         statut.setBibliothecaire(new Bibliothecaire());
         statut.getBibliothecaire().setId_biblio(idBibliothecaire);
         statutExemplaireRepository.save(statut);
-
+    
         // Pour prêt "Sur place", programmer le retour à Disponible le lendemain
         if (isSurPlace) {
             StatusExemplaire statutDisponible = new StatusExemplaire();
@@ -172,12 +172,12 @@ if (!penalites.isEmpty()) {
             statutDisponible.getBibliothecaire().setId_biblio(idBibliothecaire);
             statutExemplaireRepository.save(statutDisponible);
         }
-
+    
         // 11. Décrémenter le quota de l'adhérent
         int nouveauQuota = adherent.getQuotaRestant() - 1;
         adherent.setQuotaRestant(nouveauQuota);
         adherentRepository.save(adherent);
-
+    
         return null; // null = succès
     }
 
@@ -244,7 +244,6 @@ if (!penalites.isEmpty()) {
     }
 
     public List<Pret> rechercherPrets(String adherent, String exemplaire, Integer idTypePret, String dateDebut, String dateFin) {
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setTimeZone(TimeZone.getTimeZone("EAT"));
         Date startDate = null;
@@ -287,9 +286,7 @@ if (!penalites.isEmpty()) {
                 endDate);
     }
 
-
     public String retournerPret(int idAdherent, int idExemplaire, String dateRetour, int idBibliothecaire) {
-
         // Vérifier si le prêt existe et n'est pas retourné
         Optional<Pret> optPret = pretRepository.findNonReturnedByAdherentAndExemplaire(idAdherent, idExemplaire);
         if (optPret.isEmpty()) {
@@ -342,13 +339,19 @@ if (!penalites.isEmpty()) {
         return null;
     }
 
-    public String prolongerPret(int idPret, int idBibliothecaire, Date dateProlongement) {
+    public String demanderProlongement(int idPret, Date dateProlongement) {
         // 1. Vérifier l'existence du prêt
         Optional<Pret> optPret = pretRepository.findById(idPret);
         if (optPret.isEmpty()) {
             return "Le prêt n'existe pas.";
         }
         Pret pret = optPret.get();
+
+                // 2. Vérifier si une demande de prolongation existe déjà pour ce prêt
+                List<Prolongement> prolongementsExistants = prolongementRepository.findByPretId(idPret);
+                if (!prolongementsExistants.isEmpty()) {
+                    return "Une demande de prolongation a déjà été soumise pour ce prêt.";
+                }
 
         // 2. Vérifier si le prêt est déjà retourné
         if (pret.getDateRetourReelle() != null) {
@@ -420,17 +423,76 @@ if (!penalites.isEmpty()) {
             return "La nouvelle date de retour dépasse la date de fin de l'abonnement de l'adhérent.";
         }
 
-        // 12. Mettre à jour le prêt
-        pret.setDateRetourPrevue(nouvelleDateRetourPrevue);
-        pret.setNbProlongements(pret.getNbProlongements() + 1);
-        pretRepository.save(pret);
-
-        // 13. Enregistrer la prolongation dans la table Prolongement
+        // 12. Créer une demande de prolongation
         Prolongement prolongement = new Prolongement();
         prolongement.setPret(pret);
+        prolongement.setDateProlongementProposee(nouvelleDateRetourPrevue);
+        prolongement.setStatut("en attente");
         prolongementRepository.save(prolongement);
 
         return null; // Succès
     }
-    
+
+    public String accepterProlongement(int idProlongement, int idBibliothecaire) {
+        // 1. Vérifier l'existence de la demande de prolongation
+        Optional<Prolongement> optProlongement = prolongementRepository.findById(idProlongement);
+        if (optProlongement.isEmpty()) {
+            return "La demande de prolongation n'existe pas.";
+        }
+        Prolongement prolongement = optProlongement.get();
+
+        // 2. Vérifier si la demande est en attente
+        if (!"en attente".equalsIgnoreCase(prolongement.getStatut())) {
+            return "La demande de prolongation n'est pas en attente.";
+        }
+
+        Pret pret = prolongement.getPret();
+
+        // 3. Vérifier si le prêt est déjà retourné
+        if (pret.getDateRetourReelle() != null) {
+            return "Le prêt a déjà été retourné.";
+        }
+
+        // 4. Vérifier le quota de l'adhérent
+        Adherent adherent = pret.getAdherent();
+        if (adherent.getQuotaRestant() <= 0) {
+            return "L'adhérent a atteint son quota de prêts.";
+        }
+
+        // 5. Mettre à jour le prêt
+        pret.setDateRetourPrevue(prolongement.getDateProlongementProposee());
+        pret.setNbProlongements(pret.getNbProlongements() + 1);
+        pretRepository.save(pret);
+
+        // 6. Mettre à jour le statut de la prolongation
+        prolongement.setStatut("acceptée");
+        prolongementRepository.save(prolongement);
+
+        // 7. Décrémenter le quota de l'adhérent
+        int nouveauQuota = adherent.getQuotaRestant() - 1;
+        adherent.setQuotaRestant(nouveauQuota);
+        adherentRepository.save(adherent);
+
+        return null; // Succès
+    }
+
+    public String refuserProlongement(int idProlongement) {
+        // 1. Vérifier l'existence de la demande de prolongation
+        Optional<Prolongement> optProlongement = prolongementRepository.findById(idProlongement);
+        if (optProlongement.isEmpty()) {
+            return "La demande de prolongation n'existe pas.";
+        }
+        Prolongement prolongement = optProlongement.get();
+
+        // 2. Vérifier si la demande est en attente
+        if (!"en attente".equalsIgnoreCase(prolongement.getStatut())) {
+            return "La demande de prolongation n'est pas en attente.";
+        }
+
+        // 3. Mettre à jour le statut de la prolongation
+        prolongement.setStatut("refusée");
+        prolongementRepository.save(prolongement);
+
+        return null; // Succès
+    }
 }
