@@ -15,6 +15,9 @@ public class Penalite {
     @Column(name = "duree_penalite", nullable = false)
     private int dureePenalite;
 
+    @Column(name = "date_application", nullable = false)
+    private String dateApplication;
+
     public Penalite() {}
 
     public int getId_penalite() {
@@ -39,5 +42,13 @@ public class Penalite {
 
     public void setDureePenalite(int dureePenalite) {
         this.dureePenalite = dureePenalite;
+    }
+
+    public String getDateApplication() {
+        return dateApplication;
+    }
+
+    public void setDateApplication(String dateApplication) {
+        this.dateApplication = dateApplication;
     }
 }
