@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -43,6 +44,9 @@ public class ReservationService {
 
     @Autowired
     private TypePretRepository typePretRepository;
+
+    @Autowired
+    private PenaliteRepository penaliteRepository;
 
     public String validerReservation(int idAdherent, int idExemplaire, Date dateReservation) {
         // Vérifier que la date n'est pas dans le passé
@@ -180,6 +184,21 @@ public class ReservationService {
         if (adherent.getQuotaRestant() <= 0) {
             return "L'adhérent a atteint son quota de prêts.";
         }
+
+        // Vérifier si l'adhérent est pénalisé
+List<Penalite> penalites = penaliteRepository.findAll().stream()
+    .filter(p -> p.getPret().getAdherent().getId_adherent() == idAdherent)
+    .filter(p -> {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(p.getDateApplication());
+        cal.add(Calendar.DATE, p.getDureePenalite());
+        Date dateFinPenalite = cal.getTime();
+        return dateReservation.before(dateFinPenalite) || dateReservation.equals(dateFinPenalite);
+    })
+    .collect(Collectors.toList());
+if (!penalites.isEmpty()) {
+    return "L'adhérent est actuellement pénalisé et ne peut pas réserver.";
+}
 
         // 7. Mettre à jour le statut de la réservation à "valide"
         Optional<StatutReservation> optStatutValide = statutReservationRepository.findByLibelle("valide");
