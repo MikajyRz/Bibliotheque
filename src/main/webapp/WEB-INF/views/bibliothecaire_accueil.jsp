@@ -239,6 +239,7 @@
         <a href="${pageContext.request.contextPath}/reservations/nouveau/accueil?section=reservation">Réserver un exemplaire</a>
         <a href="${pageContext.request.contextPath}/reservations/demandes/accueil?section=demande_reservation">Demandes de réservation</a>
         <a href="${pageContext.request.contextPath}/penalites/appliquer">Appliquer une pénalité</a>
+        <a href="${pageContext.request.contextPath}/penalites/historique">Historique des pénalités</a>
         <a href="${pageContext.request.contextPath}/auth/logout">Déconnexion</a>
     </div>
 
@@ -574,6 +575,53 @@
             </div>
             <button type="submit">Appliquer la pénalité</button>
         </form>
+    </c:if>
+
+    <c:if test="${section == 'historique_penalites'}">
+        <h2>Historique des pénalités</h2>
+        <c:choose>
+            <c:when test="${empty penalites}">
+                <p>Aucune pénalité trouvée.</p>
+            </c:when>
+            <c:otherwise>
+                <table border="1">
+                    <tr>
+                        <th>ID Pénalité</th>
+                        <th>Prêt</th>
+                        <th>Adhérent</th>
+                        <th>Durée (jours)</th>
+                        <th>Date d'application</th>
+                        <th>Date de retour réelle</th>
+                        <th>Date de fin de pénalité</th>
+                    </tr>
+                    <c:forEach items="${penalites}" var="penalite">
+                        <tr>
+                            <td>${penalite.id_penalite}</td>
+                            <td>Prêt #${penalite.pret.id_pret}</td>
+                            <td>${penalite.pret.adherent.nom}</td>
+                            <td>${penalite.dureePenalite}</td>
+                            <td>
+                                <fmt:formatDate value="${penalite.dateApplication}" pattern="yyyy-MM-dd" />
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty penalite.pret.dateRetourReelle}">
+                                        <fmt:formatDate value="${penalite.pret.dateRetourReelle}" pattern="yyyy-MM-dd" />
+                                    </c:when>
+                                    <c:otherwise>Non retourné</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <jsp:useBean id="dateFinPenalite" class="java.util.Date" />
+                                <c:set target="${dateFinPenalite}" property="time" 
+                                       value="${penalite.dateApplication.time + (penalite.dureePenalite * 24 * 60 * 60 * 1000)}" />
+                                <fmt:formatDate value="${dateFinPenalite}" pattern="yyyy-MM-dd" />
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
+            </c:otherwise>
+        </c:choose>
     </c:if>
 
     
