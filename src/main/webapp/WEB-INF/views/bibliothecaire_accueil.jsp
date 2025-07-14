@@ -239,6 +239,7 @@
         <a href="${pageContext.request.contextPath}/reservations/nouveau/accueil?section=reservation">Réserver un exemplaire</a>
         <a href="${pageContext.request.contextPath}/reservations/demandes/accueil?section=demande_reservation">Demandes de réservation</a>
         <a href="${pageContext.request.contextPath}/penalites/appliquer">Appliquer une pénalité</a>
+        <a href="${pageContext.request.contextPath}/penalites/historique">Historique des pénalités</a>
         <a href="${pageContext.request.contextPath}/auth/logout">Déconnexion</a>
     </div>
 
@@ -575,6 +576,28 @@
             <button type="submit">Appliquer la pénalité</button>
         </form>
     </c:if>
+
+    <c:if test="${section == 'historique_penalites'}">
+    <h2>Historique des pénalités</h2>
+    <table>
+        <tr>
+            <th>ID Pénalité</th>
+            <th>Prêt</th>
+            <th>Adhérent</th>
+            <th>Durée (jours)</th>
+            <th>Date d'application</th>
+        </tr>
+        <c:forEach items="${penalites}" var="penalite">
+            <tr>
+                <td>${penalite.id_penalite}</td>
+                <td>Prêt #${penalite.pret.id_pret}</td>
+                <td>${penalite.pret.adherent.nom}</td>
+                <td>${penalite.dureePenalite}</td>
+                <td>${penalite.dateApplication}</td>
+            </tr>
+        </c:forEach>
+    </table>
+</c:if>
 
     
 </div>

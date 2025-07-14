@@ -24,6 +24,9 @@ import java.util.TimeZone;
 public class PenaliteController {
 
     @Autowired
+    private PenaliteRepository penaliteRepository;
+
+        @Autowired
     private PenaliteService penaliteService;
 
     @Autowired
@@ -84,6 +87,18 @@ public class PenaliteController {
             model.addAttribute("errorMessage", resultat);
         }
 
+        return "bibliothecaire_accueil";
+    }
+
+    @GetMapping("/penalites/historique")
+    public String historiquePenalites(Model model, HttpSession session) {
+        if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
+            return "redirect:/auth/login";
+        }
+        List<Penalite> penalites = penaliteRepository.findAll();
+        model.addAttribute("penalites", penalites);
+        model.addAttribute("section", "historique_penalites");
+        model.addAttribute("userName", session.getAttribute("userName"));
         return "bibliothecaire_accueil";
     }
 }
