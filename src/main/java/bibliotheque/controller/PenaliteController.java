@@ -1,9 +1,11 @@
 package bibliotheque.controller;
 
+import bibliotheque.entity.Penalite;
 import bibliotheque.entity.Adherent;
 import bibliotheque.entity.Pret;
 import bibliotheque.repository.AdherentRepository;
 import bibliotheque.repository.PretRepository;
+import bibliotheque.repository.PenaliteRepository;
 import bibliotheque.service.PenaliteService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ public class PenaliteController {
     @Autowired
     private PenaliteRepository penaliteRepository;
 
-        @Autowired
+    @Autowired
     private PenaliteService penaliteService;
 
     @Autowired
@@ -90,7 +92,7 @@ public class PenaliteController {
         return "bibliothecaire_accueil";
     }
 
-    @GetMapping("/penalites/historique")
+    @GetMapping("historique")
     public String historiquePenalites(Model model, HttpSession session) {
         if (!"bibliothecaire".equals(session.getAttribute("userRole"))) {
             return "redirect:/auth/login";
