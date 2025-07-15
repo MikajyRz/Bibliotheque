@@ -22,6 +22,7 @@ E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\PenaliteRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Adherent.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\PenaliteController.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\LivreRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\TypeAdherent.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\Bibliothecaire.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\PretRepository.java
@@ -40,10 +41,13 @@ E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\AdherentRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\ExemplaireRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\HomeController.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\controller\LivreController.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\dto\LivreDisponibleProjection.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\EtatExemplaireRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\AbonnementRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\StatutReservationRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\JourFerieRepository.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\repository\BibliothecaireRepository.java
+E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\LivreService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\service\BibliothecaireService.java
 E:\S4\INF209-Web_Dyn(Mr_Naina)\Tp_Spring\VraiExamenBiblio\Bibliotheque\src\main\java\bibliotheque\entity\TypeLivre.java
