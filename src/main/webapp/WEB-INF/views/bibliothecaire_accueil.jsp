@@ -373,7 +373,6 @@
             }
         }
 
-        /* Amélioration des tableaux sur mobile */
         @media (max-width: 600px) {
             .table-responsive table {
                 font-size: 0.75rem;
@@ -846,7 +845,6 @@
     
 </div>
 <script>
-    // Validation pour dateProlongement
     document.querySelectorAll('.return-form input[name="dateProlongement"]').forEach(input => {
         input.addEventListener('change', () => {
             const dateProlongement = new Date(input.value);
@@ -864,7 +862,6 @@
         });
     });
 
-    // Validation pour dateReservation
     const dateReservationInput = document.querySelector('input[name="dateReservation"]');
     if (dateReservationInput) {
         dateReservationInput.addEventListener('change', () => {

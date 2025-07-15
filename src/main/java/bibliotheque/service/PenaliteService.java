@@ -74,9 +74,9 @@ public class PenaliteService {
         Penalite penalite = new Penalite();
         penalite.setPret(pret);
         penalite.setDureePenalite(dureePenalite);
-        penalite.setDateApplication(dateApplication); // Conversion en String comme dans l'entité Penalite
+        penalite.setDateApplication(dateApplication); 
         penaliteRepository.save(penalite);
 
-        return null; // Succès
+        return null; 
     }
 }
