@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PretRepository extends JpaRepository<Pret, Integer> {
-    List<Pret> findAll();
+        List<Pret> findAll();
 
-    @Query("SELECT p FROM Pret p " +
+        @Query("SELECT p FROM Pret p WHERE p.adherent.id_adherent = :idAdherent")
+        List<Pret> findByAdherentId(@Param("idAdherent") Integer idAdherent);
+
+        @Query("SELECT p FROM Pret p " +
            "JOIN p.adherent a " +
            "JOIN p.exemplaire e " +
            "JOIN e.livre l " +
@@ -22,7 +25,7 @@ public interface PretRepository extends JpaRepository<Pret, Integer> {
            "AND (:idTypePret IS NULL OR p.typePret.id_type_pret = :idTypePret) " +
            "AND (:dateDebut IS NULL OR p.datePret >= :dateDebut) " +
            "AND (:dateFin IS NULL OR p.datePret <= :dateFin)")
-    List<Pret> findByCriteria(
+        List<Pret> findByCriteria(
             @Param("adherent") String adherent,
             @Param("exemplaire") String exemplaire,
             @Param("exemplaireId") Integer exemplaireId,
@@ -31,18 +34,18 @@ public interface PretRepository extends JpaRepository<Pret, Integer> {
             @Param("dateFin") Date dateFin);
 
 
-    @Query("SELECT p FROM Pret p " +
+         @Query("SELECT p FROM Pret p " +
             "WHERE p.adherent.id_adherent = :idAdherent " +
             "AND p.exemplaire.id_exemplaire = :idExemplaire " +
             "AND p.dateRetourReelle IS NULL")
-     Optional<Pret> findNonReturnedByAdherentAndExemplaire(
+         Optional<Pret> findNonReturnedByAdherentAndExemplaire(
              @Param("idAdherent") Integer idAdherent,
              @Param("idExemplaire") Integer idExemplaire);
 
-    @Query("SELECT p FROM Pret p " +
+         @Query("SELECT p FROM Pret p " +
             "WHERE p.exemplaire.id_exemplaire = :idExemplaire " +
             "AND (p.dateRetourReelle IS NULL OR p.dateRetourReelle > :datePret)")
-    List<Pret> findActivePretsByExemplaireAndDate(
+        List<Pret> findActivePretsByExemplaireAndDate(
             @Param("idExemplaire") Integer idExemplaire,
             @Param("datePret") Date datePret);
 }

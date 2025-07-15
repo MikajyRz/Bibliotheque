@@ -124,6 +124,8 @@ CREATE TABLE Pret (
 CREATE TABLE Prolongement (
     id_prolongement INT PRIMARY KEY AUTO_INCREMENT,
     id_pret INT NOT NULL,
+    date_prolongement_proposee DATE NOT NULL,
+    statut VARCHAR(20) NOT NULL DEFAULT 'en attente',
     FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
 );
 

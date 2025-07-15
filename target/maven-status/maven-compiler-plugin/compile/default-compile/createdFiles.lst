@@ -13,6 +13,7 @@ bibliotheque\repository\ExemplaireRepository.class
 bibliotheque\service\ReservationService.class
 bibliotheque\repository\PenaliteRepository.class
 bibliotheque\controller\PretController.class
+bibliotheque\controller\LivreController.class
 bibliotheque\entity\StatutReservation.class
 bibliotheque\repository\AuteurRepository.class
 bibliotheque\controller\AdherentController.class
@@ -20,15 +21,18 @@ bibliotheque\service\BibliothecaireService.class
 bibliotheque\entity\Auteur.class
 bibliotheque\repository\StatusExemplaireRepository.class
 bibliotheque\service\ExemplaireService.class
+bibliotheque\dto\LivreDisponibleProjection.class
 bibliotheque\controller\AuthController.class
 bibliotheque\entity\Abonnement.class
 bibliotheque\controller\BibliothecaireController.class
 bibliotheque\entity\EtatExemplaire.class
 bibliotheque\controller\HomeController.class
 bibliotheque\repository\ProlongementRepository.class
+bibliotheque\repository\LivreRepository.class
 bibliotheque\service\PretService.class
 bibliotheque\entity\JourFerie.class
 bibliotheque\repository\AdherentRepository.class
+bibliotheque\service\LivreService.class
 bibliotheque\repository\PretRepository.class
 bibliotheque\entity\Livre.class
 bibliotheque\service\AdherentService.class
